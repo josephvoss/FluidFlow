@@ -35,7 +35,7 @@ class Simulation
 
 		//Physical Values
 		int rho;
-		int mu; 
+		int nu; 
 		int F; //needed?
 
 		int numCells;
@@ -53,5 +53,7 @@ class Simulation
 		int myRank, size;
 		int counter = 1;
 		int subCounter = 1;
+		int recCounts[size];
+		int displs[size];
 
 };

@@ -1,19 +1,23 @@
 #Makefile
-ERR = $(shell which icpc >/dev/null; echo $$?)
-ifeq "$(ERR)" "0"
-    CC := icc
-    OMPFLAG := -openmp
-else	
-    CC := gcc
-    OMPFLAG := -fopenmp
-endif
+CC := mpic++
+OMPFLAG := -openmp
 
-EXECS := main
-OBJ := $(EXECS:=.o)
-SRC := $(OBJ:.o=.c)
+EXEC := fluid
 
-main: main.c
-	${CC} $(OMPFLAG) -O0 -o graphTransversal $@.c -lm
+info:
+	@echo "Usage:\tmake all\n\tmake clean"
+
+all: fluid
+
+fluid: main.o Simulation.o
+	$(CC) main.o Simulation.o -o fluid
+	$(RM) main.o Simulation.o
+
+main.o: main.c
+	${CC} -c ./main.cpp
+
+Simulation.o:
+	$(CC) -c ./Simulation.cpp
 
 clean:
-	$(RM) $(EXECS)
+	$(RM) $(EXEC) main.o Simulation.o

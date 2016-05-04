@@ -2,20 +2,20 @@
 
 Simulation::Simulation(void)
 {
-	nx = 101;
-	ny = 101;
-	nt = 100;
+	nx = 10;
+	ny = 10;
+	nt = 10;
 	dx = 2/(nx-1);
 	dy = 2/(ny-1);
 	dt = 0.0001;
 
 	//Physical Values
-	rho = 
-	mu = 
+	rho = 1; 
+	nu = .1;
 	F = //needed? 
 
-	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
+	myRank = MPI::COMM_WORLD.Get_rank();
+	size = MPI::COMM_WORLD.Get_size();
 
 	counter = 0;
 
@@ -31,6 +31,15 @@ Simulation::Simulation(void)
 	nGlobalSolvedData = (datumPoint*) malloc(sizeof(datumPoint)*nx*ny);
 	localData = (datumPoint*) malloc(sizeof(datumPoint)*numCells);
 	allSolvedData = (datumPoint*) malloc(sizeof(datumPoint)*nx*ny*nt);
+
+	//Populate recCount and displs arrays
+	MPI::COMM_WORLD.Allgather(numCells, 1, MPI::INT, recCounts, size, MPI::INT);
+	int sum = 0;
+	for (i=0; i<size; i++)
+	{
+		sum += recCount[i]*sizeof(int);
+		displs[i] = sum;
+	}		
 }
 
 void Simulation::buildUpB(int xLocation, int yLocation)
@@ -157,7 +166,7 @@ void Simulation::iterate(void)
 
 				localPresData[i] = pressurePreSolve(xLocation, yLocation); //needs to be for n-1
 			}
-			//MPIAll_gather
+			MPI::COMM_WORLD.Allgatherv(localPresData, numCells, MPI::DOUBLE, solvedPrePresData[subCounter], recCounts, disps, MPI::DOUBLE);
 			subCounter += 1;
 		}
 		
