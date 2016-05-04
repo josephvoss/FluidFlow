@@ -8,9 +8,9 @@
 
 typedef struct
 {
-	double p;
 	double u;
 	double v;
+	double p;
 } datumPoint;
 
 class Simulation
@@ -18,19 +18,20 @@ class Simulation
 	public:
 		Simulation();
 		void buildUpB;
-		float pressureSolve(int xLocation, int yLocation);
+		float pressurePreSolve(int xLocation, int yLocation);
 		float xMomentumSolve(int xLocation, int yLocation);
 		float yMomentumSolve(int xLocation, int yLocation);
 		void iterate(void);
 
 	private:
 		//Size values
-		int nx;
-		int ny;
-		int nt;
-		int dx;
-		int dy;
-		int dt;
+		int nx = 101;
+		int ny = 101;
+		int nt = 100;
+		int nit = nt;
+		int dx = 2/(nx-1);
+		int dy = 2/(nx-1);
+		int dt = 0.0001;
 
 		//Physical Values
 		int rho;
@@ -42,15 +43,15 @@ class Simulation
 		int startingLocation;
 
 		//Solved data storage
-/*		datumPoint nGlobalSolvedData[problemSize];
-		datumPoint localData[numCells];
-		datumPoint allSolvedData[nt][problemSize];
-*/
-		datumPoint* nGlobalSolvedData;
-		datumPoint* localData;
-		datumPoint* allSolvedData;
+		datumPoint localVelData[numCells];
+		datumPoint solvedVelData[nt][problemSize];
+		double localPrePresData[numCells];
+		double solvedPrePresData[nt][problemSize];
+//		double bPressureData[numCells];
+
 		//MPI data
 		int myRank, size;
-		int counter;
+		int counter = 1;
+		int subCounter = 1;
 
 };

@@ -40,25 +40,42 @@ void Simulation::buildUpB(int xLocation, int yLocation)
 	datumPoint gbl[problemSize] = globalSolvedData;
 	double uijn = gbl[xLocation+yLocation*ny].u;
 	double vijn = gbl[xLocation+yLocation*ny].v;
-	double ui-1jn = gbl[xLocation+(yLocation-1)*ny].u;
-	double ui+1jn = gbl[xLocation+(yLocation+1)*ny].u;
-	double uij-1n = gbl[xLocation-1+yLocation*ny].u;
-	double uij+1n = glb[xLocation+1+yLocation*ny].u;
-	double vi-1jn = gbl[xLocation+(yLocation-1)*ny].v;
-	double vi+1jn = gbl[xLocation+(yLocation+1)*ny].v;
-	double vij-1n = gbl[xLocation-1+yLocation*ny].v;
-	double vij+1n = glb[xLocation+1+yLocation*ny].v;
+	double uim1jn = gbl[xLocation+(yLocation-1)*ny].u;
+	double uip1jn = gbl[xLocation+(yLocation+1)*ny].u;
+	double uijm1n = gbl[xLocation-1+yLocation*ny].u;
+	double uijp1n = glb[xLocation+1+yLocation*ny].u;
+	double vim1jn = gbl[xLocation+(yLocation-1)*ny].v;
+	double vip1jn = gbl[xLocation+(yLocation+1)*ny].v;
+	double vijm1n = gbl[xLocation-1+yLocation*ny].v;
+	double vijp1n = glb[xLocation+1+yLocation*ny].v;
 
-	b=rho*(1/dt*((ui+1jn - ui-1jn)/(2*dx) + (vij+1n - vij-1n)/(2*dy)) -\
-	pow((ui+1jn - ui-1j)/(2*dx),2) - 2*(uij+1n - uij-1n)/(2*dy) * \
-	(vi+1jn - vi-1jn)/(2*dx) - pow((vij+1n - vij-1n)/(2*dy),2));
-
+	return rho*(1/dt*((uip1jn - uim1jn)/(2*dx) + (vijp1n - vijm1n)/(2*dy)) -\
+	pow((uip1jn - uim1j)/(2*dx),2) - 2*(uijp1n - uijm1n)/(2*dy) * \
+	(vip1jn - vim1jn)/(2*dx) - pow((vijp1n - vijm1n)/(2*dy),2));
 
 }
 
-float Simulation::pressureSolve(int xLocation, int yLocation)
+float Simulation::pressurePreSolve(int xLocation, int yLocation)
 {
 	int pseudoTime;
+	//Aliases
+	datumPoint gbl[problemSize] = solvedVelData[counter];
+	double pre[problemSize] = solvedPrePresData[subCounter-1]
+	double uijn = gbl[xLocation+yLocation*ny].u;
+	double vijn = gbl[xLocation+yLocation*ny].v;
+	double uim1jn = gbl[xLocation+(yLocation-1)*ny].u;
+	double uip1jn = gbl[xLocation+(yLocation+1)*ny].u;
+	double uijm1n = gbl[xLocation-1+yLocation*ny].u;
+	double uijp1n = glb[xLocation+1+yLocation*ny].u;
+	double vim1jn = gbl[xLocation+(yLocation-1)*ny].v;
+	double vip1jn = gbl[xLocation+(yLocation+1)*ny].v;
+	double vijm1n = gbl[xLocation-1+yLocation*ny].v;
+	double vijp1n = glb[xLocation+1+yLocation*ny].v;
+	double pijp1n = glb[xLocation+1+yLocation*ny].p;
+	double pijm1n = glb[xLocation-1+yLocation*ny].p;
+	double pip1jn = pre[xLocation+(yLocation+1)*ny];
+	double pim1jn = pre[xLocation+(yLocation-1)*ny];
+
 	//For distributed workload collective needs to be done at end of each ptimestep
 	//Will square the communication necessary
 	//Conversely, could have one dedicated proc for solving pressure, while all others
@@ -67,40 +84,32 @@ float Simulation::pressureSolve(int xLocation, int yLocation)
 		//calculations
 		//All others will have to do ny*nx/P. Smaller than atleast a factor of 100
 		//Using OMP could only reduce this time by potentially 16.
-	for(pseudoTime=0; pseudoTime < nt; pseudoTime++)
-	{
-		for(i=0; i<ny; i++)
-		{
-			for(j=0; j<nx; j++)
-			{
-				p=((pi+1jn+pi-1jn)*dy*dy+(pij+1n-pij-1n)*dx*dx)/(2*(dx*dx+dy*dy)) - dx*dx*dy*dy/(dx*dx+dy*dy)*b
-			}
-		}
-	}
+	//Treat pressure solving as velocity solving
+	return ((pip1jn+pim1jn)*dy*dy+(pijp1n-pijm1n)*dx*dx)/(2*(dx*dx+dy*dy));// - dx*dx*dy*dy/(dx*dx+dy*dy)*b
 };
 
 float Simulation::xMomentumSolve(int xLocation, int yLocation)
 {
 	//Aliases
-	datumPoint gbl[problemSize] = globalSolvedData;
+	datumPoint gbl[problemSize] = solvedVelData[counter-1];
 	double uijn = gbl[xLocation+yLocation*ny].u;
 	double vijn = gbl[xLocation+yLocation*ny].v;
-	double ui-1jn = gbl[xLocation+(yLocation-1)*ny].u;
-	double ui+1jn = gbl[xLocation+(yLocation+1)*ny].u;
-	double uij-1n = gbl[xLocation-1+yLocation*ny].u;
-	double uij+1n = glb[xLocation+1+yLocation*ny].u;
-	double vi-1jn = gbl[xLocation+(yLocation-1)*ny].v;
-	double vi+1jn = gbl[xLocation+(yLocation+1)*ny].v;
-	double vij-1n = gbl[xLocation-1+yLocation*ny].v;
-	double vij+1n = glb[xLocation+1+yLocation*ny].v;
-	double pij+1n = glb[xLocation+1+yLocation*ny].p;
-	double pij-1n = glb[xLocation-1+yLocation*ny].p;
-	double pi+1jn = glb[xLocation+(yLocation+1)*ny].p;
-	double pi-1jn = glb[xLocation+(yLocation-1)*ny].p;
+	double uim1jn = gbl[xLocation+(yLocation-1)*ny].u;
+	double uip1jn = gbl[xLocation+(yLocation+1)*ny].u;
+	double uijm1n = gbl[xLocation-1+yLocation*ny].u;
+	double uijp1n = glb[xLocation+1+yLocation*ny].u;
+	double vim1jn = gbl[xLocation+(yLocation-1)*ny].v;
+	double vip1jn = gbl[xLocation+(yLocation+1)*ny].v;
+	double vijm1n = gbl[xLocation-1+yLocation*ny].v;
+	double vijp1n = glb[xLocation+1+yLocation*ny].v;
+	double pijp1n = glb[xLocation+1+yLocation*ny].p;
+	double pijm1n = glb[xLocation-1+yLocation*ny].p;
+	double pip1jn = glb[xLocation+(yLocation+1)*ny].p;
+	double pim1jn = glb[xLocation+(yLocation-1)*ny].p;
 
-	return  vijn - uijn*dt/dx*(vijn - vi-1jn) - vijn*dt/dy*(vijn - vij-1n) -\
-	dt/(rho*2*dy)*(pij+1n - pij+1n) + nu*(dt/(dx*dx)*(vi+1jn - 2*vijn + vi-1jn)\
-	dt/(rho*dy*dy)*(vij+1n - 2*vijn + vij-1n));
+	return  vijn - uijn*dt/dx*(vijn - vim1jn) - vijn*dt/dy*(vijn - vijm1n) -\
+	dt/(rho*2*dy)*(pijp1n - pijp1n) + nu*(dt/(dx*dx)*(vip1jn - 2*vijn + vim1jn)\
+	dt/(rho*dy*dy)*(vijp1n - 2*vijn + vijm1n));
 }
 
 float Simulation::yMomentumSolve(int xLocation, int yLocation)
@@ -109,22 +118,27 @@ float Simulation::yMomentumSolve(int xLocation, int yLocation)
 	datumPoint gbl[problemSize] = globalSolvedData;
 	double uijn = gbl[xLocation+yLocation*ny].u;
 	double vijn = gbl[xLocation+yLocation*ny].v;
-	double ui-1jn = gbl[xLocation+(yLocation-1)*ny].u;
-	double ui+1jn = gbl[xLocation+(yLocation+1)*ny].u;
-	double uij-1n = gbl[xLocation-1+yLocation*ny].u;
-	double uij+1n = glb[xLocation+1+yLocation*ny].u;
-	double vi-1jn = gbl[xLocation+(yLocation-1)*ny].v;
-	double vi+1jn = gbl[xLocation+(yLocation+1)*ny].v;
-	double vij-1n = gbl[xLocation-1+yLocation*ny].v;
-	double vij+1n = glb[xLocation+1+yLocation*ny].v;
-	double pij+1n = glb[xLocation+1+yLocation*ny].p;
-	double pij-1n = glb[xLocation-1+yLocation*ny].p;
-	double pi+1jn = glb[xLocation+(yLocation+1)*ny].p;
-	double pi-1jn = glb[xLocation+(yLocation-1)*ny].p;
+	double uim1jn = gbl[xLocation+(yLocation-1)*ny].u;
+	double uip1jn = gbl[xLocation+(yLocation+1)*ny].u;
+	double uijm1n = gbl[xLocation-1+yLocation*ny].u;
+	double uijp1n = glb[xLocation+1+yLocation*ny].u;
+	double vim1jn = gbl[xLocation+(yLocation-1)*ny].v;
+	double vip1jn = gbl[xLocation+(yLocation+1)*ny].v;
+	double vijm1n = gbl[xLocation-1+yLocation*ny].v;
+	double vijp1n = glb[xLocation+1+yLocation*ny].v;
+	double pijp1n = glb[xLocation+1+yLocation*ny].p;
+	double pijm1n = glb[xLocation-1+yLocation*ny].p;
+	double pip1jn = glb[xLocation+(yLocation+1)*ny].p;
+	double pim1jn = glb[xLocation+(yLocation-1)*ny].p;
 
-	return  uijn - uijn*dt/dx*(uijn - ui-1jn) - vijn*dt/dy*(uijn - uij-1n) -\
-	dt/(rho*2*dx)*(pi+1jn - pi-1jn) + nu*(dt/(dx*dx)*(ui+1jn - 2*uijn + ui-1jn)\
-	dt/(rho*dy*dy)*(uij+1n - 2*uijn + uij-1n)) + F*dt;
+	return  uijn - uijn*dt/dx*(uijn - uim1jn) - vijn*dt/dy*(uijn - uijm1n) -\
+	dt/(rho*2*dx)*(pip1jn - pim1jn) + nu*(dt/(dx*dx)*(uip1jn - 2*uijn + uim1jn)\
+	dt/(rho*dy*dy)*(uijp1n - 2*uijn + uijm1n)) + F*dt;
+}
+
+double pressureSolve(int xLocation, int yLocation)
+{
+	return localPresData[xLocation+yLocation*ny] - dx*dx*dy*dy/(dx*dx+dy*dy)*buildUpB(xLocation, yLocation); 
 }
 
 void Simulation::iterate(void)
@@ -132,16 +146,31 @@ void Simulation::iterate(void)
 	//U and V populating
 	while (counter < nt)
 	{
+		//Pressure Populating
+		//Solve pressure for n+1
+		while (subCounter < nit)
+		{
+			for (i=0; i<numCells; i++)
+			{
+				xLocation = startingLocation % nx;
+				yLocation = startingLocation / ny;
+
+				localPresData[i] = pressurePreSolve(xLocation, yLocation); //needs to be for n-1
+			}
+			//MPIAll_gather
+			subCounter += 1;
+		}
+		
 		//Runs over local workload
-		for (i=0; i<problemSize; i++)
+		for (i=0; i<numCells; i++)
 		{
 			xLocation = startingLocation % nx;
 			yLocation = startingLocation / ny;
 
-			localData[i].p = pressureFind(xLocation, yLocation);
-			localData[i].u = xMomentumFind(xLocation, yLocation);
-			localData[i].v = yMomentumFind(xLocation, yLocation);
-			
+			localVelData[i].u = xMomentumSolve(xLocation, yLocation); //needs to be for n
+			localVelData[i].v = yMomentumSolve(xLocation, yLocation); //needs to be for n
+			localVelData[i].p = pressureSolve(xLocation, yLocation); //needs to be for n
+	
 		}
 
 //		MPI_allgather
