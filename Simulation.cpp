@@ -168,11 +168,13 @@ double Simulation::pressureSolve(int xLocation, int yLocation)
 
 void Simulation::iterate(void)
 {
-	int recCounts[size];
+//	int recCounts[size];
 	int displs[size];
-
+	int* pNumCells = &numCells;
+	int* recCounts;
+	recCounts = (int*) malloc(sizeof(int)*size);
 	//Populate recCount and displs arrays
-	MPI::COMM_WORLD.Allgather(&numCells, 1, MPI::INT, (void*) &recCounts, size, MPI::INT);
+	MPI::COMM_WORLD.Allgather(pNumCells, 1, MPI::INT, recCounts, size, MPI::INT);
 	int sum = 0;
 	int i;
 	for (i=0; i<size; i++)
@@ -195,7 +197,7 @@ void Simulation::iterate(void)
 
 				localPrePresData[i] = pressurePreSolve(xLocation, yLocation); //needs to be for n-1
 			}
-			MPI::COMM_WORLD.Allgatherv(&localPrePresData, numCells, MPI::DOUBLE, solvedPrePresData[subCounter], (const int*) &recCounts, displs, MPI::DOUBLE);
+//			MPI::COMM_WORLD.Allgatherv(&localPrePresData, numCells, MPI::DOUBLE, solvedPrePresData[subCounter], (const int*) &recCounts, displs, MPI::DOUBLE);
 			subCounter += 1;
 		}
 		
