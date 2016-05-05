@@ -16,8 +16,7 @@ typedef struct
 class Simulation
 {
 	public:
-//		Simulation();
-		void init(void);
+		Simulation();
 		double buildUpB(int xLocation, int yLocation);
 		double pressurePreSolve(int xLocation, int yLocation);
 		double pressureSolve(int xLocation, int yLocation);
@@ -27,9 +26,9 @@ class Simulation
 
 	private:
 		//Size values
-		const static int nx = 101;
-		const static int ny = 101;
-		const static int nt = 100;
+		const static int nx = 10;
+		const static int ny = 10;
+		const static int nt = 10;
 		const static int nit = nt;
 		double dx = 2/(nx-1);
 		double dy = 2/(nx-1);
@@ -48,6 +47,7 @@ class Simulation
 
 		//Solved data storage
 		datumPoint localVelData[];
+		datumPoint solvedVelData[nt][problemSize];
 		double localPrePresData[];
 		double solvedPrePresData[nit][problemSize];
 //		double bPressureData[numCells];
@@ -56,7 +56,5 @@ class Simulation
 		int myRank, size;
 		int counter = 1;
 		int subCounter = 1;
-	public:
-		datumPoint solvedVelData[nt][problemSize];
 
 };
