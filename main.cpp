@@ -1,4 +1,5 @@
 #include "Simulation.h"
+#include <iostream>
 
 //Pressure function can't be solved independently - how solve?
 //Solve for velocity iteratively - then use points? Issue is if
@@ -7,11 +8,14 @@
 int main(int argc, char** argv)
 {
 	MPI::Init();
-	printf("Hello\n");
 	
-	Simulation workBench;
-	workBench.iterate();
+	std::cout<<"Hello?"<<std::endl;
+	Simulation* workBench = new Simulation;
+	workBench->init();
+	workBench->iterate();
 
-	MPI::Finalize();
+	std::cout<<workBench->solvedVelData[99][5].u<<std::endl;
+
+	
 	return 0;
 }

@@ -17,7 +17,7 @@ fluid: main.o Simulation.o
 main.o: main.cpp
 	${CC} $(FLAGS) -c ./main.cpp
 
-Simulation.o:
+Simulation.o: Simulation.cpp Simulation.h
 	$(CC) $(FLAGS) -c ./Simulation.cpp
 
 clean:

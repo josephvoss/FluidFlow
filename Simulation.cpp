@@ -1,6 +1,8 @@
 #include "Simulation.h"
 
-Simulation::Simulation(void)
+//Simulation::Simulation(void)
+
+void Simulation::init(void)
 {
 	myRank = MPI::COMM_WORLD.Get_rank();
 	size = MPI::COMM_WORLD.Get_size();
@@ -14,6 +16,22 @@ Simulation::Simulation(void)
 			numCells += 1;
 
 	startingLocation = numCells * myRank;
+
+	for (i=0; i<problemSize; i++)
+	{
+		solvedVelData[0][i].p = 0;
+		solvedVelData[0][i].u = 0;
+		solvedVelData[0][i].v = 0;
+		solvedPrePresData[0][i] = 0;
+	}
+
+	for (i=0; i<numCells; i++)
+	{
+		localVelData[i].p = 0;
+		localVelData[i].u = 0;
+		localVelData[i].v = 0;
+		localPrePresData[i] = 0;
+	}
 }
 
 double Simulation::buildUpB(int xLocation, int yLocation)
@@ -123,7 +141,7 @@ void Simulation::iterate(void)
 	int displs[size];
 
 	//Populate recCount and displs arrays
-	MPI::COMM_WORLD.Allgather(&numCells, 1, MPI::INT, (void*) &recCounts, size, MPI::INT);
+//	MPI::COMM_WORLD.Allgather(&numCells[0], 1, MPI::INT, (void*) &recCounts[0], size, MPI::INT);
 	int sum = 0;
 	int i;
 	for (i=0; i<size; i++)
@@ -144,9 +162,9 @@ void Simulation::iterate(void)
 				xLocation = startingLocation % nx;
 				yLocation = startingLocation / ny;
 
-				localPrePresData[i] = pressurePreSolve(xLocation, yLocation); //needs to be for n-1
+				//localPrePresData[i] = pressurePreSolve(xLocation, yLocation); //needs to be for n-1
 			}
-			MPI::COMM_WORLD.Allgatherv(&localPrePresData, numCells, MPI::DOUBLE, solvedPrePresData[subCounter], (const int*) &recCounts, displs, MPI::DOUBLE);
+//			MPI::COMM_WORLD.Allgatherv(&localPrePresData[0], numCells, MPI::DOUBLE, solvedPrePresData[subCounter], (const int*) &recCounts[0], displs, MPI::DOUBLE);
 			subCounter += 1;
 		}
 		
@@ -156,9 +174,9 @@ void Simulation::iterate(void)
 			xLocation = startingLocation % nx;
 			yLocation = startingLocation / ny;
 
-			localVelData[i].u = xMomentumSolve(xLocation, yLocation); //needs to be for n
-			localVelData[i].v = yMomentumSolve(xLocation, yLocation); //needs to be for n
-			localVelData[i].p = pressureSolve(xLocation, yLocation); //needs to be for n
+		//	localVelData[i].u = xMomentumSolve(xLocation, yLocation); //needs to be for n
+		//	localVelData[i].v = yMomentumSolve(xLocation, yLocation); //needs to be for n
+		//	localVelData[i].p = pressureSolve(xLocation, yLocation); //needs to be for n
 	
 		}
 
