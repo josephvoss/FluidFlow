@@ -46,7 +46,7 @@ class Simulation
 		int xLocation, yLocation;
 
 		//Solved data storage
-		datumPoint localVelData[];
+		datumPoint* localVelData;
 		double* localPrePresData;
 		double* solvedPrePresData[nit];
 //		double bPressureData[numCells];
@@ -54,7 +54,8 @@ class Simulation
 		int* recCounts;
 
 		//MPI data
-		int myRank, size;
+		int myRank= 10;
+		int size = 10;
 		int counter = 1;
 		int subCounter = 1;
 

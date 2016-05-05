@@ -1,7 +1,7 @@
 #Makefile
 CC := mpic++
 OMPFLAG := -openmp
-FLAGS := -std=c++11 -ggdb
+FLAGS := -std=c++11 -ggdb -O0
 
 EXEC := fluid
 
