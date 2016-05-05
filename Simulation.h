@@ -47,14 +47,17 @@ class Simulation
 
 		//Solved data storage
 		datumPoint localVelData[];
-		datumPoint solvedVelData[nt][problemSize];
-		double localPrePresData[];
-		double solvedPrePresData[nit][problemSize];
+		double* localPrePresData;
+		double* solvedPrePresData[nit];
 //		double bPressureData[numCells];
+
+		int* recCounts;
 
 		//MPI data
 		int myRank, size;
 		int counter = 1;
 		int subCounter = 1;
 
+	public:
+		datumPoint solvedVelData[nt][problemSize];
 };

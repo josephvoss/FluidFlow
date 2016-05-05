@@ -4,16 +4,21 @@
 
 Simulation::Simulation()
 {
+	//Workload distribution
+	int i;
 	myRank = MPI::COMM_WORLD.Get_rank();
 	size = MPI::COMM_WORLD.Get_size();
-
-	//Workload distribution
 	numCells = problemSize/size;
 	leftOvers = problemSize % size;
-	int i;
 	for (i=1; i<leftOvers+1; i++)
 		if (i == myRank)
 			numCells += 1;
+
+	//init local data Arrays
+	recCounts = (int*) malloc(sizeof(int)*size);
+	localPrePresData = (double*) malloc(sizeof(double)*numCells);
+	for (i=0; i<nit; i++)
+		solvedPrePresData[i] = (double*) malloc(sizeof(double)*problemSize);
 
 	startingLocation = numCells * myRank;
 
@@ -168,12 +173,9 @@ double Simulation::pressureSolve(int xLocation, int yLocation)
 
 void Simulation::iterate(void)
 {
-//	int recCounts[size];
+	//Populate recCount and displs arrays
 	int displs[size];
 	int* pNumCells = &numCells;
-	int* recCounts;
-	recCounts = (int*) malloc(sizeof(int)*size);
-	//Populate recCount and displs arrays
 	MPI::COMM_WORLD.Allgather(pNumCells, 1, MPI::INT, recCounts, size, MPI::INT);
 	int sum = 0;
 	int i;
@@ -197,7 +199,7 @@ void Simulation::iterate(void)
 
 				localPrePresData[i] = pressurePreSolve(xLocation, yLocation); //needs to be for n-1
 			}
-//			MPI::COMM_WORLD.Allgatherv(&localPrePresData, numCells, MPI::DOUBLE, solvedPrePresData[subCounter], (const int*) &recCounts, displs, MPI::DOUBLE);
+			MPI::COMM_WORLD.Allgatherv(localPrePresData, numCells, MPI::DOUBLE, solvedPrePresData[subCounter], (const int*) recCounts, displs, MPI::DOUBLE);
 			subCounter += 1;
 		}
 		
