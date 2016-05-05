@@ -1,6 +1,7 @@
 #Makefile
 CC := mpic++
 OMPFLAG := -openmp
+FLAGS := -std=c++11 -ggdb
 
 EXEC := fluid
 
@@ -10,14 +11,14 @@ info:
 all: fluid
 
 fluid: main.o Simulation.o
-	$(CC) main.o Simulation.o -o fluid
-	$(RM) main.o Simulation.o
+	$(CC) $(FLAGS) main.o Simulation.o -o fluid
+#:	$(RM) main.o Simulation.o
 
-main.o: main.c
-	${CC} -c ./main.cpp
+main.o: main.cpp
+	${CC} $(FLAGS) -c ./main.cpp
 
 Simulation.o:
-	$(CC) -c ./Simulation.cpp
+	$(CC) $(FLAGS) -c ./Simulation.cpp
 
 clean:
 	$(RM) $(EXEC) main.o Simulation.o

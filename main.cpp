@@ -4,9 +4,10 @@
 //Solve for velocity iteratively - then use points? Issue is if
 //no stable solution exists
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
-	MPI::Init(argc, argv);
+	MPI::Init();
+	printf("Hello\n");
 	
 	Simulation workBench;
 	workBench.iterate();
