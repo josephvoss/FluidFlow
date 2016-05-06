@@ -188,6 +188,11 @@ void Simulation::iterate(void)
 	int sum = 0;
 	int i;
 
+	//Defining MPI data type
+	MPI_Datatype newType;
+	MPI_Type_contiguous(3,MPI_DOUBLE, &newType);
+	MPI_Type_commit(&newType);
+
 	//Length from receive buffer to put data
 	for (i=0; i<size; i++)
 	{
@@ -219,13 +224,17 @@ void Simulation::iterate(void)
 			xLocation = (startingLocation+i) % nx;
 			yLocation = (startingLocation+i) / ny;
 
-		//	localVelData[i].u = xMomentumSolve(xLocation, yLocation); //needs to be for n
-		//	localVelData[i].v = yMomentumSolve(xLocation, yLocation); //needs to be for n
-		//	localVelData[i].p = pressureSolve(xLocation, yLocation); //needs to be for n
+			localVelData[i].u = xMomentumSolve(xLocation, yLocation); //needs to be for n
+			localVelData[i].v = yMomentumSolve(xLocation, yLocation); //needs to be for n
+			localVelData[i].p = pressureSolve(xLocation, yLocation); //needs to be for n
 	
 		}
 
 //		MPI_allgather
+		MPI_Allgatherv(localVelData, numCells, newType, solvedVelData[counter], (const int*) recCounts, displs, newType, MPI_COMM_WORLD);
+
 		counter += 1;
 	}
+
+	MPI_Type_free(&newType);
 }

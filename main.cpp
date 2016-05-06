@@ -17,7 +17,7 @@ int main(int argc, char** argv)
 
 	Simulation* workBench = new Simulation;
 	workBench->iterate();
-//	std::cout<<workBench->solvedVelData[9][10].u<<std::endl;
+
 //	dataSet.write(workBench->solvedVelData,H5::PredType::NATIVE_DOUBLE);
 
 	
