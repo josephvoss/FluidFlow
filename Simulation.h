@@ -15,22 +15,6 @@ typedef struct
 
 class Simulation
 {
-	public:
-		Simulation();
-		double buildUpB(int xLocation, int yLocation);
-		double pressurePreSolve(int xLocation, int yLocation);
-		double pressureSolve(int xLocation, int yLocation);
-		double xMomentumSolve(int xLocation, int yLocation);
-		double yMomentumSolve(int xLocation, int yLocation);
-		void iterate(void);
-
-		int getRank(void)
-			{	return myRank;	}
-		int getNt(void)
-			{ 	return nt; 	}
-		int getProblemSize(void)
-			{ 	return problemSize; 	}
-
 	private:
 		//Size values
 		const static int nx = 10;
@@ -62,7 +46,24 @@ class Simulation
 		//MPI data
 		int counter = 1;
 		int subCounter = 1;
+		int myRank;
+		int size;
 
 	public:
+		Simulation();
+		double buildUpB(int xLocation, int yLocation);
+		double pressurePreSolve(int xLocation, int yLocation);
+		double pressureSolve(int xLocation, int yLocation);
+		double xMomentumSolve(int xLocation, int yLocation);
+		double yMomentumSolve(int xLocation, int yLocation);
+		void iterate(void);
+
+		int getNt(void)
+			{ 	return nt; 	}
+		int getProblemSize(void)
+			{ 	return problemSize; 	}
+		int getRank(void)
+			{ 	return myRank; 	}
+
 		datumPoint solvedVelData[nt][problemSize];
 };
