@@ -16,8 +16,8 @@ int main(int argc, char** argv)
 //	H5::Dataset dataSet = file.openDataSet("dset");
 
 	Simulation* workBench = new Simulation;
-//	workBench->iterate();
-//	std::cout<<workBench->solvedVelData[50][50].u<<std::endl;
+	workBench->iterate();
+//	std::cout<<workBench->solvedVelData[9][10].u<<std::endl;
 //	dataSet.write(workBench->solvedVelData,H5::PredType::NATIVE_DOUBLE);
 
 	

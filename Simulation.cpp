@@ -5,12 +5,9 @@
 Simulation::Simulation()
 {
 	//Workload distribution
-	int i, tempRank, tempSize;
-	MPI_Comm_rank(MPI_COMM_WORLD, &tempRank);
-	MPI_Comm_size(MPI_COMM_WORLD, &tempSize);
-	this->myRank = tempRank;
-	this->size = tempSize;
-	printf("%d, %d\n", myRank, size);	
+	int i;
+	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	numCells = problemSize/size;
 	leftOvers = problemSize % size;
 	for (i=1; i<leftOvers+1; i++)
@@ -19,6 +16,9 @@ Simulation::Simulation()
 
 	//init local data Arrays
 	recCounts = (int*) malloc(sizeof(int)*size);
+	for (i=0; i<size; i++)
+		recCounts[i] = 0;
+
 	localPrePresData = (double*) malloc(sizeof(double)*numCells);
 	localVelData = (datumPoint*) malloc(sizeof(datumPoint)*numCells);
 	for (i=0; i<nit; i++)
@@ -41,8 +41,6 @@ Simulation::Simulation()
 		localVelData[i].v = 1;
 		localPrePresData[i] = 1;
 	}
-
-	this->iterate();
 }
 
 double Simulation::buildUpB(int xLocation, int yLocation)
@@ -179,11 +177,10 @@ double Simulation::pressureSolve(int xLocation, int yLocation)
 
 void Simulation::iterate(void)
 {
-	printf("%d, %d\n", this->myRank, this->size);	
 	//Populate recCount and displs arrays
 	int displs[size];
 	int* pNumCells = &numCells;
-	MPI_Allgather(pNumCells, 1, MPI_INT, recCounts, size, MPI_INT, MPI_COMM_WORLD);
+	MPI_Allgather(pNumCells, 1, MPI_INT, recCounts, 1, MPI_INT, MPI_COMM_WORLD);
 	int sum = 0;
 	int i;
 	for (i=0; i<size; i++)
@@ -201,20 +198,20 @@ void Simulation::iterate(void)
 		{
 			for (i=0; i<numCells; i++)
 			{
-				xLocation = startingLocation % nx;
-				yLocation = startingLocation / ny;
+				xLocation = startingLocation+i % nx;
+				yLocation = startingLocation+i / ny;
 
 				localPrePresData[i] = pressurePreSolve(xLocation, yLocation); //needs to be for n-1
 			}
-		//	MPI::COMM_WORLD.Allgatherv(localPrePresData, numCells, MPI::DOUBLE, solvedPrePresData[subCounter], (const int*) recCounts, displs, MPI::DOUBLE);
+			MPI::COMM_WORLD.Allgatherv(localPrePresData, numCells, MPI::DOUBLE, solvedPrePresData[subCounter], (const int*) recCounts, displs, MPI::DOUBLE);
 			subCounter += 1;
 		}
 		
 		//Runs over local workload
 		for (i=0; i<numCells; i++)
 		{
-			xLocation = startingLocation % nx;
-			yLocation = startingLocation / ny;
+			xLocation = startingLocation+i % nx;
+			yLocation = startingLocation+i / ny;
 
 		//	localVelData[i].u = xMomentumSolve(xLocation, yLocation); //needs to be for n
 		//	localVelData[i].v = yMomentumSolve(xLocation, yLocation); //needs to be for n
