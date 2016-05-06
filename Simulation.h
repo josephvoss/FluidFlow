@@ -24,6 +24,13 @@ class Simulation
 		double yMomentumSolve(int xLocation, int yLocation);
 		void iterate(void);
 
+		int getRank(void)
+			{	return myRank;	}
+		int getNt(void)
+			{ 	return nt; 	}
+		int getProblemSize(void)
+			{ 	return problemSize; 	}
+
 	private:
 		//Size values
 		const static int nx = 10;
@@ -47,17 +54,15 @@ class Simulation
 
 		//Solved data storage
 		datumPoint* localVelData;
-		datumPoint solvedVelData[nt][problemSize];
 		double* localPrePresData;
 		double* solvedPrePresData[nit];
 
 		int* recCounts;
 
 		//MPI data
-		int myRank= 10;
-		int size = 10;
 		int counter = 1;
 		int subCounter = 1;
 
 	public:
+		datumPoint solvedVelData[nt][problemSize];
 };
