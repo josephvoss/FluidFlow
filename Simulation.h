@@ -30,9 +30,9 @@ class Simulation
 		const static int ny = 10;
 		const static int nt = 10;
 		const static int nit = nt;
-		double dx = 2/(nx-1);
-		double dy = 2/(nx-1);
-		double dt = 0.0001;
+		double dx;
+		double dy;
+		double dt;
 
 		//Physical Values
 		int rho=1;

@@ -4,6 +4,10 @@
 
 Simulation::Simulation()
 {
+	dx = (float) 2/(nx-1);
+	dy = (float) 2/(nx-1);
+	dt = 0.0001;
+
 	//Workload distribution
 	int i;
 	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
@@ -94,7 +98,7 @@ double Simulation::pressurePreSolve(int xLocation, int yLocation)
 		return 0;
 	if (yLocation == 0)
 		return 0;
-	if (xLocation == ny-1)
+	if (xLocation == nx-1)
 		return 0;
 	if (xLocation == 0)
 		return 0;
@@ -103,6 +107,15 @@ double Simulation::pressurePreSolve(int xLocation, int yLocation)
 
 double Simulation::xMomentumSolve(int xLocation, int yLocation)
 {
+	if (yLocation == ny-1)
+		return 0;
+	if (yLocation == 0)
+		return 0;
+	if (xLocation == ny-1)
+		return 0;
+	if (xLocation == 0)
+		return 0;
+
 	//Aliases
 	double uijn = solvedVelData[counter-1][xLocation+yLocation*ny].u;
 	double vijn = solvedVelData[counter-1][xLocation+yLocation*ny].v;
@@ -118,15 +131,6 @@ double Simulation::xMomentumSolve(int xLocation, int yLocation)
 	double pijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].p;
 	double pip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].p;
 	double pim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].p;
-
-	if (yLocation == ny-1)
-		return 0;
-	if (yLocation == 0)
-		return 0;
-	if (xLocation == ny-1)
-		return 0;
-	if (xLocation == 0)
-		return 0;
 
 	return vijn - uijn*dt/dx*(vijn - vim1jn) - vijn*dt/dy*(vijn - vijm1n) -
 	dt/(rho*2*dy)*(pijp1n - pijp1n) + nu*(dt/(dx*dx)*(vip1jn - 2*vijn + vim1jn) + 
@@ -183,10 +187,12 @@ void Simulation::iterate(void)
 	MPI_Allgather(pNumCells, 1, MPI_INT, recCounts, 1, MPI_INT, MPI_COMM_WORLD);
 	int sum = 0;
 	int i;
+
+	//Length from receive buffer to put data
 	for (i=0; i<size; i++)
 	{
-		sum += recCounts[i]*sizeof(int);
 		displs[i] = sum;
+		sum += recCounts[i];
 	}		
 
 	//U and V populating
@@ -198,20 +204,20 @@ void Simulation::iterate(void)
 		{
 			for (i=0; i<numCells; i++)
 			{
-				xLocation = startingLocation+i % nx;
-				yLocation = startingLocation+i / ny;
+				xLocation = (startingLocation+i)% nx;
+				yLocation = (startingLocation+i)/ nx;
 
 				localPrePresData[i] = pressurePreSolve(xLocation, yLocation); //needs to be for n-1
 			}
-			MPI::COMM_WORLD.Allgatherv(localPrePresData, numCells, MPI::DOUBLE, solvedPrePresData[subCounter], (const int*) recCounts, displs, MPI::DOUBLE);
+			MPI_Allgatherv(localPrePresData, numCells, MPI_DOUBLE, solvedPrePresData[subCounter], (const int*) recCounts, displs, MPI_DOUBLE, MPI_COMM_WORLD);
 			subCounter += 1;
 		}
 		
 		//Runs over local workload
 		for (i=0; i<numCells; i++)
 		{
-			xLocation = startingLocation+i % nx;
-			yLocation = startingLocation+i / ny;
+			xLocation = (startingLocation+i) % nx;
+			yLocation = (startingLocation+i) / ny;
 
 		//	localVelData[i].u = xMomentumSolve(xLocation, yLocation); //needs to be for n
 		//	localVelData[i].v = yMomentumSolve(xLocation, yLocation); //needs to be for n
