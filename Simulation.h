@@ -40,6 +40,7 @@ class Simulation
 		datumPoint* localVelData;
 		double* localPrePresData;
 		double* solvedPrePresData[nit];
+		datumPoint solvedVelData[nt][problemSize];
 
 		int* recCounts;
 
@@ -60,10 +61,16 @@ class Simulation
 
 		int getNt(void)
 			{ 	return nt; 	}
+		int getNx(void)
+			{ 	return nx; 	}
+		int getNy(void)
+			{ 	return ny; 	}
 		int getProblemSize(void)
 			{ 	return problemSize; 	}
 		int getRank(void)
 			{ 	return myRank; 	}
 
-		datumPoint solvedVelData[nt][problemSize];
+		double solvedPMat[nt][ny][nx];
+		double solvedUMat[nt][ny][nx];
+		double solvedVMat[nt][ny][nx];
 };

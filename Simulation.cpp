@@ -32,9 +32,9 @@ Simulation::Simulation()
 
 	for (i=0; i<problemSize; i++)
 	{
-		solvedVelData[0][i].p = 1;
-		solvedVelData[0][i].u = 1;
-		solvedVelData[0][i].v = 1;
+		solvedVelData[0][i].p = 100;
+		solvedVelData[0][i].u = 100;
+		solvedVelData[0][i].v = 100;
 		solvedPrePresData[0][i] = 1;
 	}
 
@@ -232,7 +232,14 @@ void Simulation::iterate(void)
 
 //		MPI_allgather
 		MPI_Allgatherv(localVelData, numCells, newType, solvedVelData[counter], recCounts, displs, newType, MPI_COMM_WORLD);
-
+		int x,y;
+		for (i=0; i<problemSize; i++)
+		{
+			x = i/nx; y = i%nx;
+			solvedPMat[counter][y][x] = i;//solvedVelData[counter][startingLocation+i].p;
+			solvedUMat[counter][y][x] = i;// solvedVelData[counter][i].u;
+			solvedVMat[counter][y][x] = i;//solvedVelData[counter][i].v;
+		}
 		counter += 1;
 	}
 
