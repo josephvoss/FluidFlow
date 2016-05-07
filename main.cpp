@@ -15,9 +15,12 @@ int main(int argc, char** argv)
 	Simulation* workBench = new Simulation;
 	workBench->iterate();
 
+	std::cout<<"Running"<<std::endl;
 	if (workBench->getRank() == 0)
 	{
-		H5::H5File* file = new H5::H5File("output.hdf5",H5F_ACC_RDWR);
+		H5::H5File* file = NULL;
+		file = new H5::H5File("output.hdf5",H5F_ACC_EXCL);
+		std::cout<<"Made a file"<<std::endl;
 		hsize_t dimsf[2];
 		dimsf[0] = workBench->getNt();
 		dimsf[1] = workBench->getProblemSize();
@@ -27,6 +30,7 @@ int main(int argc, char** argv)
 
 		dataSet->write(workBench->solvedVelData, H5::PredType::NATIVE_DOUBLE);
 		std::cout<<"Hellllo"<<std::endl;
+		delete file;
 	}
 	
 	return 0;
