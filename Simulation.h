@@ -40,7 +40,6 @@ class Simulation
 		datumPoint* localVelData;
 		double* localPrePresData;
 		double* solvedPrePresData[nit];
-		datumPoint solvedVelData[nt][problemSize];
 
 		int* recCounts;
 
@@ -73,4 +72,5 @@ class Simulation
 		double solvedPMat[nt][ny][nx];
 		double solvedUMat[nt][ny][nx];
 		double solvedVMat[nt][ny][nx];
+		datumPoint solvedVelData[nt][problemSize];
 };

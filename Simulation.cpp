@@ -32,9 +32,9 @@ Simulation::Simulation()
 
 	for (i=0; i<problemSize; i++)
 	{
-		solvedVelData[0][i].p = 100;
-		solvedVelData[0][i].u = 100;
-		solvedVelData[0][i].v = 100;
+		solvedVelData[0][i].p = 100+i;
+		solvedVelData[0][i].u = 20;
+		solvedVelData[0][i].v = 30;
 		solvedPrePresData[0][i] = 1;
 	}
 
@@ -226,7 +226,7 @@ void Simulation::iterate(void)
 
 			localVelData[i].u = xMomentumSolve(xLocation, yLocation); //needs to be for n
 			localVelData[i].v = yMomentumSolve(xLocation, yLocation); //needs to be for n
-			localVelData[i].p = pressureSolve(xLocation, yLocation); //needs to be for n
+			localVelData[i].p = counter;//pressureSolve(xLocation, yLocation); //needs to be for n
 	
 		}
 
