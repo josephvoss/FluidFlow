@@ -214,7 +214,7 @@ void Simulation::iterate(void)
 
 				localPrePresData[i] = pressurePreSolve(xLocation, yLocation); //needs to be for n-1
 			}
-			MPI_Allgatherv(localPrePresData, numCells, MPI_DOUBLE, solvedPrePresData[subCounter], (const int*) recCounts, displs, MPI_DOUBLE, MPI_COMM_WORLD);
+			MPI_Allgatherv(localPrePresData, numCells, MPI_DOUBLE, solvedPrePresData[subCounter], recCounts, displs, MPI_DOUBLE, MPI_COMM_WORLD);
 			subCounter += 1;
 		}
 		
@@ -231,7 +231,7 @@ void Simulation::iterate(void)
 		}
 
 //		MPI_allgather
-		MPI_Allgatherv(localVelData, numCells, newType, solvedVelData[counter], (const int*) recCounts, displs, newType, MPI_COMM_WORLD);
+		MPI_Allgatherv(localVelData, numCells, newType, solvedVelData[counter], recCounts, displs, newType, MPI_COMM_WORLD);
 
 		counter += 1;
 	}

@@ -15,8 +15,8 @@ HDF5noprog = $(subst g++ ,,${HDF5raw})
 HDF5linker = $(shell echo ${HDF5noprog} | awk 'BEGIN {FS="./test.false"} {print $$1}')
 HDF5compile = $(shell echo ${HDF5noprog} | awk 'BEGIN {FS="./test.false"} {print $$2}')
 
-CompileFlags = ${MPIcompile} -std=c++11 -ggdb #{HDF5compile}
-LinkerFlags = ${MPIlinker} #${HDF5linker}
+CompileFlags = ${MPIcompile} -std=c++11 -ggdb ${HDF5compile}
+LinkerFlags = ${MPIlinker} ${HDF5linker}
 
 EXEC := fluid
 
