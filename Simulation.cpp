@@ -236,9 +236,10 @@ void Simulation::iterate(void)
 		for (i=0; i<problemSize; i++)
 		{
 			x = i/nx; y = i%nx;
-			solvedPMat[counter][y][x] = i;//solvedVelData[counter][startingLocation+i].p;
-			solvedUMat[counter][y][x] = i;// solvedVelData[counter][i].u;
-			solvedVMat[counter][y][x] = i;//solvedVelData[counter][i].v;
+			//swap x and y for better hdf5 formatting, unnecessary
+			solvedPMat[counter][x][y] = i;//solvedVelData[counter][startingLocation+i].p;
+			solvedUMat[counter][x][y] = i;// solvedVelData[counter][i].u;
+			solvedVMat[counter][x][y] = i;//solvedVelData[counter][i].v;
 		}
 		counter += 1;
 	}
