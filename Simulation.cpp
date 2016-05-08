@@ -113,7 +113,7 @@ double Simulation::pressureSolve(int xLocation, int yLocation)
 	return x;
 };
 
-double Simulation::xMomentumSolve(int xLocation, int yLocation)
+double Simulation::yMomentumSolve(int xLocation, int yLocation)
 {
 	if (yLocation == ny-1)
 		return 0;
@@ -135,17 +135,17 @@ double Simulation::xMomentumSolve(int xLocation, int yLocation)
 	double vip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].v;
 	double vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
 	double vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
-	double pijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].p;
-	double pijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].p;
-	double pip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].p;
-	double pim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].p;
+	double pip1jn = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
+	double pim1jn = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
+	double pijp1n = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
+	double pijm1n = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
 
 	return vijn - uijn*dt/dx*(vijn - vim1jn) - vijn*dt/dy*(vijn - vijm1n) -
-	dt/(rho*2*dy)*(pijp1n - pijp1n) + nu*(dt/(dx*dx)*(vip1jn - 2*vijn + vim1jn) + 
-	dt/(rho*dy*dy)*(vijp1n - 2*vijn + vijm1n));
+	dt/(2*dy)*(pijp1n - pijp1n) + nu*(dt/(dx*dx)*(vip1jn - 2*vijn + vim1jn) + 
+	dt/(dy*dy)*(vijp1n - 2*vijn + vijm1n));
 }
 
-double Simulation::yMomentumSolve(int xLocation, int yLocation)
+double Simulation::xMomentumSolve(int xLocation, int yLocation)
 {
 	//Aliases
 	double uijn = solvedVelData[counter-1][xLocation+yLocation*ny].u;
@@ -158,10 +158,10 @@ double Simulation::yMomentumSolve(int xLocation, int yLocation)
 	double vip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].v;
 	double vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
 	double vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
-	double pijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].p;
-	double pijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].p;
-	double pip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].p;
-	double pim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].p;
+	double pip1jn = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
+	double pim1jn = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
+	double pijp1n = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
+	double pijm1n = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
 
 	if (yLocation == ny-1)
 		return 0;
@@ -173,8 +173,8 @@ double Simulation::yMomentumSolve(int xLocation, int yLocation)
 		return 0;
 
 	return  uijn - uijn*dt/dx*(uijn - uim1jn) - vijn*dt/dy*(uijn - uijm1n) -
-	dt/(rho*2*dx)*(pip1jn - pim1jn) + nu*(dt/(dx*dx)*(uip1jn - 2*uijn + uim1jn) +
-	dt/(rho*dy*dy)*(uijp1n - 2*uijn + uijm1n)) + F*dt;
+	dt/(2*dx)*(pip1jn - pim1jn) + nu*(dt/(dx*dx)*(uip1jn - 2*uijn + uim1jn) +
+	dt/(dy*dy)*(uijp1n - 2*uijn + uijm1n)) + F*dt;
 }
 
 void Simulation::iterate(void)
@@ -204,12 +204,11 @@ void Simulation::iterate(void)
 		//Pressure Populating
 		for (i=0; i<numCells; i++)
 		{
-			xLocation = (startingLocation+i)% nx;
-			yLocation = (startingLocation+i)/ nx;
-
 			//Doesn't this need full pressure data, not just solvedPrePresData???
 			solvedPrePresData[0][i] = solvedVelData[counter-1][i].p; //pressurePreSolve uses this array
+			localB[i] = buildUpB(xLocation, yLocation);
 		}
+		i=numCells;
 		//Solve pressure for n+1
 		while (subCounter < nit)
 		{
@@ -231,8 +230,6 @@ void Simulation::iterate(void)
 			xLocation = (startingLocation+i) % nx;
 			yLocation = (startingLocation+i) / ny;
 
-			localB[i] = buildUpB(xLocation, yLocation);
-
 			localVelData[i].u = xMomentumSolve(xLocation, yLocation); //needs to be for n
 			localVelData[i].v = yMomentumSolve(xLocation, yLocation); //needs to be for n
 			localVelData[i].p = localPrePresData[i]; //needs to be for n
@@ -251,7 +248,7 @@ void Simulation::iterate(void)
 			solvedVMat[counter][x][y] = i;//solvedVelData[counter][i].v;
 		}
 */
-		subCounter = 0;
+		subCounter = 1;
 		counter += 1;
 	}
 

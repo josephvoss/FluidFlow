@@ -28,7 +28,7 @@ class Simulation
 		//Physical Values
 		int rho=1;
 		int nu=.1; 
-		int F=100; //needed?
+		int F=10; //needed?
 
 		int numCells;
 		const static int problemSize = nx*ny;
