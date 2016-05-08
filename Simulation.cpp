@@ -63,10 +63,17 @@ double Simulation::buildUpB(int xLocation, int yLocation)
 	double vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
 	double vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
 
-	double b = rho*(1/dt*((uip1jn - uim1jn)/(2*dx) + (vijp1n - vijm1n)/(2*dy)) -\
-	pow((uip1jn - uim1jn)/(2*dx),2) - 2*(uijp1n - uijm1n)/(2*dy) * \
-	(vip1jn - vim1jn)/(2*dx) - pow((vijp1n - vijm1n)/(2*dy),2));
-//	printf("%d: (%d, %d) %f\n", counter, xLocation, yLocation, b);
+	if (yLocation == ny-1)
+		return 0;
+	if (yLocation == 0)
+		return 0;
+	if (xLocation == ny-1)
+		return 0;
+	if (xLocation == 0)
+		return 0;
+
+	double b = rho*(1/dt*((uip1jn - uim1jn)/(2*dx) + (vijp1n - vijm1n)/(2*dy)) - pow((uip1jn - uim1jn)/(2*dx),2) - 2*(uijp1n - uijm1n)/(2*dy) * (vip1jn - vim1jn)/(2*dx) - pow((vijp1n - vijm1n)/(2*dy),2));
+	printf("%d: (%d, %d) %f\n", counter, xLocation, yLocation, b);
 	return b;
 
 }
@@ -141,7 +148,7 @@ double Simulation::yMomentumSolve(int xLocation, int yLocation)
 	double pijm1n = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
 
 	return vijn - uijn*dt/dx*(vijn - vim1jn) - vijn*dt/dy*(vijn - vijm1n) -
-	dt/(2*dy)*(pijp1n - pijp1n) + nu*(dt/(dx*dx)*(vip1jn - 2*vijn + vim1jn) + 
+	dt/(rho*2*dy)*(pijp1n - pijp1n) + nu*(dt/(dx*dx)*(vip1jn - 2*vijn + vim1jn) + 
 	dt/(dy*dy)*(vijp1n - 2*vijn + vijm1n));
 }
 
@@ -173,7 +180,7 @@ double Simulation::xMomentumSolve(int xLocation, int yLocation)
 		return 0;
 
 	return  uijn - uijn*dt/dx*(uijn - uim1jn) - vijn*dt/dy*(uijn - uijm1n) -
-	dt/(2*dx)*(pip1jn - pim1jn) + nu*(dt/(dx*dx)*(uip1jn - 2*uijn + uim1jn) +
+	dt/(rho*2*dx)*(pip1jn - pim1jn) + nu*(dt/(dx*dx)*(uip1jn - 2*uijn + uim1jn) +
 	dt/(dy*dy)*(uijp1n - 2*uijn + uijm1n)) + F*dt;
 }
 
@@ -204,7 +211,8 @@ void Simulation::iterate(void)
 		//Pressure Populating
 		for (i=0; i<numCells; i++)
 		{
-			//Doesn't this need full pressure data, not just solvedPrePresData???
+			xLocation = (startingLocation+i)% nx;
+			yLocation = (startingLocation+i)/ nx;
 			solvedPrePresData[0][i] = solvedVelData[counter-1][i].p; //pressurePreSolve uses this array
 			localB[i] = buildUpB(xLocation, yLocation);
 		}
