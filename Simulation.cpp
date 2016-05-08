@@ -24,6 +24,7 @@ Simulation::Simulation()
 		recCounts[i] = 0;
 
 	localPrePresData = (double*) malloc(sizeof(double)*numCells);
+	localB = (double*) malloc(sizeof(double)*numCells);
 	localVelData = (datumPoint*) malloc(sizeof(datumPoint)*numCells);
 	for (i=0; i<nit; i++)
 		solvedPrePresData[i] = (double*) malloc(sizeof(double)*problemSize);
@@ -44,6 +45,7 @@ Simulation::Simulation()
 		localVelData[i].u = 0;
 		localVelData[i].v = 0;
 		localPrePresData[i] = 1;
+		localB[i] = 0;
 	}
 }
 
@@ -69,7 +71,7 @@ double Simulation::buildUpB(int xLocation, int yLocation)
 
 }
 
-double Simulation::pressurePreSolve(int xLocation, int yLocation)
+double Simulation::pressureSolve(int xLocation, int yLocation)
 {
 	//Aliases
 	double uijn = solvedVelData[counter-1][xLocation+yLocation*ny].u;
@@ -82,10 +84,10 @@ double Simulation::pressurePreSolve(int xLocation, int yLocation)
 	double vip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].v;
 	double vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
 	double vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
-	double pijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].p;
-	double pijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].p;
 	double pip1jn = solvedPrePresData[subCounter-1][xLocation+(yLocation+1)*ny];
 	double pim1jn = solvedPrePresData[subCounter-1][xLocation+(yLocation-1)*ny];
+	double pijp1n = solvedPrePresData[subCounter-1][xLocation+(yLocation+1)*ny];
+	double pijm1n = solvedPrePresData[subCounter-1][xLocation+(yLocation-1)*ny];
 
 	//For distributed workload collective needs to be done at end of each ptimestep
 	//Will square the communication necessary
@@ -106,7 +108,7 @@ double Simulation::pressurePreSolve(int xLocation, int yLocation)
 	if (xLocation == 0)
 		return 1;
 
-	double x = ((pip1jn+pim1jn)*dy*dy+(pijp1n+pijm1n)*dx*dx)/(2*(dx*dx+dy*dy));
+	double x = ((pip1jn+pim1jn)*dy*dy+(pijp1n+pijm1n)*dx*dx)/(2*(dx*dx+dy*dy)) - dx*dx*dy*dy/(dx*dx+dy*dy)*localB[xLocation+yLocation*ny];
 //	printf("%d.%d: (%d, %d) %f\n", counter, subCounter, xLocation, yLocation, x);
 	return x;
 };
@@ -175,22 +177,6 @@ double Simulation::yMomentumSolve(int xLocation, int yLocation)
 	dt/(rho*dy*dy)*(uijp1n - 2*uijn + uijm1n)) + F*dt;
 }
 
-double Simulation::pressureSolve(int xLocation, int yLocation)
-{
-	if (xLocation == nx-1)
-		return 1;
-	if (xLocation == 0)
-		return 1;
-	if (yLocation == ny-1)
-		return 1;
-	if (yLocation == 0)
-		return 1;
-
-	double b = localPrePresData[xLocation+yLocation*ny] - dx*dx*dy*dy/(dx*dx+dy*dy)*buildUpB(xLocation, yLocation); 
-//	printf("%d: (%d, %d) %f\n", counter, xLocation, yLocation, b);
-	return b;
-}
-
 void Simulation::iterate(void)
 {
 	//Populate recCount and displs arrays
@@ -216,6 +202,14 @@ void Simulation::iterate(void)
 	while (counter < nt)
 	{
 		//Pressure Populating
+		for (i=0; i<numCells; i++)
+		{
+			xLocation = (startingLocation+i)% nx;
+			yLocation = (startingLocation+i)/ nx;
+
+			//Doesn't this need full pressure data, not just solvedPrePresData???
+			solvedPrePresData[0][i] = solvedVelData[counter-1][i].p; //pressurePreSolve uses this array
+		}
 		//Solve pressure for n+1
 		while (subCounter < nit)
 		{
@@ -224,7 +218,8 @@ void Simulation::iterate(void)
 				xLocation = (startingLocation+i)% nx;
 				yLocation = (startingLocation+i)/ nx;
 
-				localPrePresData[i] = pressurePreSolve(xLocation, yLocation); //needs to be for n-1
+				localPrePresData[i] = pressureSolve(xLocation, yLocation); //needs to be for n-1
+				//Uses B, from n-1
 			}
 			MPI_Allgatherv(localPrePresData, numCells, MPI_DOUBLE, solvedPrePresData[subCounter], recCounts, displs, MPI_DOUBLE, MPI_COMM_WORLD);
 			subCounter += 1;
@@ -236,9 +231,11 @@ void Simulation::iterate(void)
 			xLocation = (startingLocation+i) % nx;
 			yLocation = (startingLocation+i) / ny;
 
+			localB[i] = buildUpB(xLocation, yLocation);
+
 			localVelData[i].u = xMomentumSolve(xLocation, yLocation); //needs to be for n
 			localVelData[i].v = yMomentumSolve(xLocation, yLocation); //needs to be for n
-			localVelData[i].p = pressureSolve(xLocation, yLocation); //needs to be for n
+			localVelData[i].p = localPrePresData[i]; //needs to be for n
 	
 		}
 

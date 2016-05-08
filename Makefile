@@ -27,7 +27,7 @@ all: fluid
 
 fluid: main.o Simulation.o
 	$(CC) $(CompileFlags) main.o Simulation.o -o fluid ${LinkerFlags}
-	$(RM) main.o Simulation.o
+#	$(RM) main.o Simulation.o
 
 main.o: main.cpp
 	${CC} $(CompileFlags) -c ./main.cpp ${LinkerFlags}

@@ -45,20 +45,20 @@ int main(int argc, char** argv)
 		H5Sselect_hyperslab(memspaceP, H5S_SELECT_SET, offsetP, stride2, count, NULL); //start stride count;
 		datasetP = H5Dcreate2(file, "P", datatype, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 		H5Dwrite(datasetP, H5T_NATIVE_DOUBLE, memspaceP, dataspace, H5P_DEFAULT, &(workBench->solvedVelData[0][0].p));
-/*		//U
-		H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, offsetP, stride1, count, NULL); //start stride count;
+		//U
+		//H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, offsetP, stride1, count, NULL); //start stride count;
 		memspaceU = H5Screate_simple(3, dimsf, NULL);
-		H5Sselect_hyperslab(memspaceU, H5S_SELECT_SET, offsetU, stride2, count, NULL); //start stride count;
+		H5Sselect_hyperslab(memspaceU, H5S_SELECT_SET, offsetP, stride2, count, NULL); //start stride count;
 		datasetU = H5Dcreate2(file, "U", datatype, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-		H5Dwrite(datasetP, H5T_NATIVE_DOUBLE, memspaceU, dataspace, H5P_DEFAULT, &(workBench->solvedVelData[0][0].p));
-*/
-/*		//V
-		H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, offsetP, stride1, count, NULL); //start stride count;
+		H5Dwrite(datasetU, H5T_NATIVE_DOUBLE, memspaceU, dataspace, H5P_DEFAULT, &(workBench->solvedVelData[0][0].u));
+
+		//V
+//		H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, offsetP, stride1, count, NULL); //start stride count;
 		memspaceV = H5Screate_simple(3, dimsf, NULL);
-		H5Sselect_hyperslab(memspaceV, H5S_SELECT_SET, offsetV, stride2, count, NULL); //start stride count;
+		H5Sselect_hyperslab(memspaceV, H5S_SELECT_SET, offsetP, stride2, count, NULL); //start stride count;
 		datasetV = H5Dcreate2(file, "V", datatype, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-		H5Dwrite(datasetP, H5T_NATIVE_DOUBLE, memspaceV, dataspace, H5P_DEFAULT, &(workBench->solvedVelData[0][0].p));
-*/
+		H5Dwrite(datasetV, H5T_NATIVE_DOUBLE, memspaceV, dataspace, H5P_DEFAULT, &(workBench->solvedVelData[0][0].v));
+
 /*		datasetP = H5Dcreate2(file, "P", datatype, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 		H5Dwrite(datasetP, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, workBench->solvedPMat);
 		datasetU = H5Dcreate2(file, "U", datatype, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -68,7 +68,7 @@ int main(int argc, char** argv)
 */
 		H5Sclose(dataspace);
 		H5Sclose(memspaceP);
-//		H5Sclose(memspaceU);
+		H5Sclose(memspaceU);
 //		H5Sclose(memspaceV);
 		H5Tclose(datatype);
 		H5Dclose(datasetP);
