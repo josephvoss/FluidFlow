@@ -107,18 +107,18 @@ double Simulation::pressureSolve(int xLocation, int yLocation, int i)
 		return 1;
 	//Periodic
 	if (xLocation == nx-1)
-		pip1jn = solvedPrePresData[counter-1][0+yLocation*ny];
+		pijp1n = solvedPrePresData[subCounter-1][0+yLocation*ny];
 	else
-		pip1jn = solvedPrePresData[subCounter-1][xLocation+(yLocation+1)*ny];
+		pijp1n = solvedPrePresData[subCounter-1][xLocation+1+yLocation*ny];
 
 	if (xLocation == 0)
-		pim1jn = solvedPrePresData[counter-1][nx-1+yLocation*ny];
+		pijm1n = solvedPrePresData[subCounter-1][nx-1+yLocation*ny];
 	else
-		pim1jn = solvedPrePresData[subCounter-1][xLocation+(yLocation-1)*ny];
+		pijm1n = solvedPrePresData[subCounter-1][(xLocation-1)+yLocation*ny];
 
 	//Aliases
-	pijp1n = solvedPrePresData[subCounter-1][xLocation+(yLocation+1)*ny];
-	pijm1n = solvedPrePresData[subCounter-1][xLocation+(yLocation-1)*ny];
+	pim1jn = solvedPrePresData[subCounter-1][xLocation+(yLocation-1)*ny];
+	pip1jn = solvedPrePresData[subCounter-1][xLocation+(yLocation+1)*ny];
 
 	//For distributed workload collective needs to be done at end of each ptimestep
 	//Will square the communication necessary
@@ -151,9 +151,9 @@ double Simulation::yMomentumSolve(int xLocation, int yLocation)
 	}
 	else
 	{
-		uip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].u;
-		vip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].v;
-		pip1jn = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
+		uijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].u;
+		vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
+		pijp1n = solvedPrePresData[nit-1][xLocation+1+yLocation*ny];
 	}
 	if (xLocation == 0)
 	{
@@ -163,20 +163,20 @@ double Simulation::yMomentumSolve(int xLocation, int yLocation)
 	}
 	else
 	{
-		uim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].u;
-		vim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].v;
-		pim1jn = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
+		uijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].u;
+		vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
+		pijm1n = solvedPrePresData[nit-1][xLocation-1+yLocation*ny];
 	}
 
 	//Aliases
+	uip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].u;
+	vip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].v;
+	pip1jn = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
+	uim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].u;
+	vim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].v;
+	pim1jn = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
 	uijn = solvedVelData[counter-1][xLocation+yLocation*ny].u;
 	vijn = solvedVelData[counter-1][xLocation+yLocation*ny].v;
-	uijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].u;
-	uijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].u;
-	vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
-	vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
-	pijp1n = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
-	pijm1n = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
 
 	return vijn - uijn*dt/dx*(vijn - vim1jn) - vijn*dt/dy*(vijn - vijm1n) -
 	dt/(rho*2*dy)*(pijp1n - pijp1n) + nu*(dt/(dx*dx)*(vip1jn - 2*vijn + vim1jn) + 
@@ -199,9 +199,9 @@ double Simulation::xMomentumSolve(int xLocation, int yLocation)
 	}
 	else
 	{
-		uip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].u;
-		vip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].v;
-		pip1jn = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
+		uijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].u;
+		vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
+		pijp1n = solvedPrePresData[nit-1][xLocation+1+yLocation*ny];
 	}
 	if (xLocation == 0)
 	{
@@ -211,20 +211,20 @@ double Simulation::xMomentumSolve(int xLocation, int yLocation)
 	}
 	else
 	{
-		uim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].u;
-		vim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].v;
-		pim1jn = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
+		uijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].u;
+		vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
+		pijm1n = solvedPrePresData[nit-1][xLocation-1+yLocation*ny];
 	}
 
 	//Aliases
+	uip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].u;
+	vip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].v;
+	pip1jn = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
+	uim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].u;
+	vim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].v;
+	pim1jn = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
 	uijn = solvedVelData[counter-1][xLocation+yLocation*ny].u;
 	vijn = solvedVelData[counter-1][xLocation+yLocation*ny].v;
-	uijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].u;
-	uijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].u;
-	vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
-	vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
-	pijp1n = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
-	pijm1n = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
 
 	return  uijn - uijn*dt/dx*(uijn - uim1jn) - vijn*dt/dy*(uijn - uijm1n) -
 	dt/(rho*2*dx)*(pip1jn - pim1jn) + nu*(dt/(dx*dx)*(uip1jn - 2*uijn + uim1jn) +
