@@ -59,34 +59,34 @@ double Simulation::buildUpB(int xLocation, int yLocation)
 	//Periodic
 	if (xLocation == nx-1)
 	{
-		uijp1n = solvedVelData[counter-1][0+yLocation*ny].u;
-		vijp1n = solvedVelData[counter-1][0+yLocation*ny].v;
+		uijp1n = solvedVelData[counter][0+yLocation*ny].u;
+		vijp1n = solvedVelData[counter][0+yLocation*ny].v;
 	}
 	else
 	{
-		uijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].u;
-		vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
+		uijp1n = solvedVelData[counter][xLocation+1+yLocation*ny].u;
+		vijp1n = solvedVelData[counter][xLocation+1+yLocation*ny].v;
 	}
 
 	if (xLocation == 0)
 	{
-		uijm1n = solvedVelData[counter-1][nx-1+yLocation*ny].u;
-		vijm1n = solvedVelData[counter-1][nx-1+yLocation*ny].v;
+		uijm1n = solvedVelData[counter][nx-1+yLocation*ny].u;
+		vijm1n = solvedVelData[counter][nx-1+yLocation*ny].v;
 	}
 	else
 	{
-		uijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].u;
-		vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
+		uijm1n = solvedVelData[counter][xLocation-1+yLocation*ny].u;
+		vijm1n = solvedVelData[counter][xLocation-1+yLocation*ny].v;
 	}
 
 	//Aliases
-	uijn = solvedVelData[counter-1][xLocation+yLocation*ny].u;
-	vijn = solvedVelData[counter-1][xLocation+yLocation*ny].v;
+	uijn = solvedVelData[counter][xLocation+yLocation*ny].u;
+	vijn = solvedVelData[counter][xLocation+yLocation*ny].v;
 
-	uip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].u;
-	vip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].v;
-	uim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].u;
-	vim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].v;
+	uip1jn = solvedVelData[counter][xLocation+(yLocation+1)*ny].u;
+	vip1jn = solvedVelData[counter][xLocation+(yLocation+1)*ny].v;
+	uim1jn = solvedVelData[counter][xLocation+(yLocation-1)*ny].u;
+	vim1jn = solvedVelData[counter][xLocation+(yLocation-1)*ny].v;
 
 
 
@@ -132,7 +132,7 @@ double Simulation::pressureSolve(int xLocation, int yLocation, int i)
 //	double x=1;
 	double x = ((pip1jn+pim1jn)*dy*dy+(pijp1n+pijm1n)*dx*dx)/(2*(dx*dx+dy*dy)) - dx*dx*dy*dy/(dx*dx+dy*dy)*localB[i];
 	if (counter > 1 && counter < 10)
-		printf("%d.%d: (%d, %d) %f %f %f %f %f\n", counter, subCounter, xLocation, yLocation,  pijp1n, pijm1n, pim1jn, pip1jn, x);
+		printf("%d.%d: (%d, %d) %f %f %f %f %f %f\n", counter, subCounter, xLocation, yLocation,  pijp1n, pijm1n, pim1jn, pip1jn, localB[i], x);
 	return x;
 };
 
