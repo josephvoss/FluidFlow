@@ -25,7 +25,6 @@ Simulation::Simulation()
 
 	localPrePresData = (double*) malloc(sizeof(double)*numCells);
 	localB = (double*) malloc(sizeof(double)*numCells);
-	globalB = (double*) malloc(sizeof(double)*problemSize);
 	localVelData = (datumPoint*) malloc(sizeof(datumPoint)*numCells);
 	for (i=0; i<nit; i++)
 		solvedPrePresData[i] = (double*) malloc(sizeof(double)*problemSize);
@@ -93,7 +92,7 @@ double Simulation::buildUpB(int xLocation, int yLocation)
 
 //	double b=0;
 	double b = rho*(1/dt*((uijp1n - uijm1n)/(2*dx) + (vip1jn - vim1jn)/(2*dy)) - pow((uijp1n - uijm1n)/(2*dx),2) - 2*(uip1jn - uim1jn)/(2*dy) * (vijp1n - vijm1n)/(2*dx) - pow((vip1jn - vim1jn)/(2*dy),2));
-	printf("%d: (%d, %d) %f\n", counter, xLocation, yLocation, b);
+//	printf("%d: (%d, %d) %f\n", counter, xLocation, yLocation, b);
 	return b;
 
 }
@@ -131,8 +130,8 @@ double Simulation::pressureSolve(int xLocation, int yLocation, int i)
 	//Treat pressure solving as velocity solving
 
 //	double x=1;
-	double x = ((pip1jn+pim1jn)*dy*dy+(pijp1n+pijm1n)*dx*dx)/(2*(dx*dx+dy*dy)) - dx*dx*dy*dy/(dx*dx+dy*dy)*globalB[i];
-//	printf("%d.%d: (%d, %d) %f\n", counter, subcounter, xlocation, ylocation, x);
+	double x = ((pip1jn+pim1jn)*dy*dy+(pijp1n+pijm1n)*dx*dx)/(2*(dx*dx+dy*dy)) - dx*dx*dy*dy/(dx*dx+dy*dy)*localB[i];
+//	printf("%d.%d: (%d, %d) %f\n", counter, subCounter, xLocation, yLocation, x);
 	return x;
 };
 
