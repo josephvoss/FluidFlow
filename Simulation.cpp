@@ -145,9 +145,9 @@ double Simulation::yMomentumSolve(int xLocation, int yLocation)
 	//Periodic
 	if (xLocation == nx-1)
 	{
-		pip1jn = solvedPrePresData[nit-1][0+yLocation*ny];
-		uip1jn = solvedVelData[counter-1][0+yLocation*ny].u;
-		vip1jn = solvedVelData[counter-1][0+yLocation*ny].v;
+		pijp1n = solvedPrePresData[nit-1][0+yLocation*ny];
+		uijp1n = solvedVelData[counter-1][0+yLocation*ny].u;
+		vijp1n = solvedVelData[counter-1][0+yLocation*ny].v;
 	}
 	else
 	{
@@ -157,9 +157,9 @@ double Simulation::yMomentumSolve(int xLocation, int yLocation)
 	}
 	if (xLocation == 0)
 	{
-		pim1jn = solvedPrePresData[nit-1][nx-1+yLocation*ny];
-		uim1jn = solvedVelData[counter-1][nx-1+yLocation*ny].u;
-		vim1jn = solvedVelData[counter-1][nx-1+yLocation*ny].v;
+		pijm1n = solvedPrePresData[nit-1][nx-1+yLocation*ny];
+		uijm1n = solvedVelData[counter-1][nx-1+yLocation*ny].u;
+		vijm1n = solvedVelData[counter-1][nx-1+yLocation*ny].v;
 	}
 	else
 	{
@@ -193,9 +193,9 @@ double Simulation::xMomentumSolve(int xLocation, int yLocation)
 	//Periodic
 	if (xLocation == nx-1)
 	{
-		pip1jn = solvedPrePresData[nit-1][0+yLocation*ny];
-		uip1jn = solvedVelData[counter-1][0+yLocation*ny].u;
-		vip1jn = solvedVelData[counter-1][0+yLocation*ny].v;
+		pijp1n = solvedPrePresData[nit-1][0+yLocation*ny];
+		uijp1n = solvedVelData[counter-1][0+yLocation*ny].u;
+		vijp1n = solvedVelData[counter-1][0+yLocation*ny].v;
 	}
 	else
 	{
@@ -205,9 +205,9 @@ double Simulation::xMomentumSolve(int xLocation, int yLocation)
 	}
 	if (xLocation == 0)
 	{
-		pim1jn = solvedPrePresData[nit-1][nx-1+yLocation*ny];
-		uim1jn = solvedVelData[counter-1][nx-1+yLocation*ny].u;
-		vim1jn = solvedVelData[counter-1][nx-1+yLocation*ny].v;
+		pijm1n = solvedPrePresData[nit-1][nx-1+yLocation*ny];
+		uijm1n = solvedVelData[counter-1][nx-1+yLocation*ny].u;
+		vijm1n = solvedVelData[counter-1][nx-1+yLocation*ny].v;
 	}
 	else
 	{
