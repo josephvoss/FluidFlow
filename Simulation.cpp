@@ -88,11 +88,7 @@ double Simulation::buildUpB(int xLocation, int yLocation)
 	uim1jn = solvedVelData[counter][xLocation+(yLocation-1)*ny].u;
 	vim1jn = solvedVelData[counter][xLocation+(yLocation-1)*ny].v;
 
-
-
-//	double b=0;
 	double b = rho*(1/dt*((uijp1n - uijm1n)/(2*dx) + (vip1jn - vim1jn)/(2*dy)) - pow((uijp1n - uijm1n)/(2*dx),2) - 2*(uip1jn - uim1jn)/(2*dy) * (vijp1n - vijm1n)/(2*dx) - pow((vip1jn - vim1jn)/(2*dy),2));
-//	printf("%d: (%d, %d) %f\n", counter, xLocation, yLocation, b);
 	return b;
 
 }
@@ -129,10 +125,7 @@ double Simulation::pressureSolve(int xLocation, int yLocation, int i)
 		//Using OMP could only reduce this time by potentially 16.
 	//Treat pressure solving as velocity solving
 
-//	double x=1;
 	double x = ((pip1jn+pim1jn)*dy*dy+(pijp1n+pijm1n)*dx*dx)/(2*(dx*dx+dy*dy)) - dx*dx*dy*dy/(dx*dx+dy*dy)*localB[i];
-	if (counter > 1 && counter < 10)
-		printf("%d.%d: (%d, %d) %f %f %f %f %f %f\n", counter, subCounter, xLocation, yLocation,  pijp1n, pijm1n, pim1jn, pip1jn, localB[i], x);
 	return x;
 };
 
@@ -226,7 +219,6 @@ double Simulation::xMomentumSolve(int xLocation, int yLocation)
 	double x = uijn - uijn*dt/dx*(uijn - uim1jn) - vijn*dt/dy*(uijn - uijm1n) -
 	dt/(rho*2*dx)*(pip1jn - pim1jn) + nu*(dt/(dx*dx)*(uip1jn - 2*uijn + uim1jn) +
 	dt/(dy*dy)*(uijp1n - 2*uijn + uijm1n)) + F*dt;
-//	printf("%d: (%d, %d) %f %f %f %f\n", counter, xLocation, yLocation, uim1jn, uijn, uip1jn, x);
 	return x;
 }
 
@@ -262,7 +254,6 @@ void Simulation::iterate(void)
 			solvedPrePresData[0][i] = solvedVelData[counter-1][i].p; //pressurePreSolve uses this array, iterates in ptime
 			localB[i] = buildUpB(xLocation, yLocation);
 		}
-//		i=numCells;
 		//Solve pressure for n
 		while (subCounter < nit)
 		{
@@ -276,16 +267,12 @@ void Simulation::iterate(void)
 			MPI_Allgatherv(localPrePresData, numCells, MPI_DOUBLE, solvedPrePresData[subCounter], recCounts, displs, MPI_DOUBLE, MPI_COMM_WORLD);
 			subCounter += 1;
 
-			// dP/dy and dP/dx bc needs to be satified after all values collected
+			// dP/dy  bc needs to be satified after all values collected
 			for (i=0; i<problemSize; i++)
 			{
 				xLocation = i% nx;
 				yLocation = i/ nx;
 
-//				if (xLocation == 0)
-//					solvedPrePresData[subCounter][yLocation*ny] = solvedPrePresData[subCounter][1+yLocation*ny];
-//				if (xLocation == nx-1)
-//					solvedPrePresData[subCounter][nx-1+yLocation*ny] = solvedPrePresData[subCounter][nx-2+yLocation*ny];
 				if (yLocation == 0)
 					solvedPrePresData[subCounter-1][xLocation] = solvedPrePresData[subCounter-1][xLocation+(1)*ny];
 				if (yLocation == ny-1)
@@ -302,12 +289,9 @@ void Simulation::iterate(void)
 			localVelData[i].u = xMomentumSolve(xLocation, yLocation); //needs to be for n
 			localVelData[i].v = yMomentumSolve(xLocation, yLocation); //needs to be for n
 			localVelData[i].p = solvedPrePresData[nit-1][startingLocation+i]; //needs to be for n
-//			if (yLocation == 40 && xLocation == 40)
-//				localVelData[i].p = 100;
 	
 		}
 
-//		MPI_allgathe
 		MPI_Allgatherv(localVelData, numCells, newType, &(solvedVelData[counter][0]), recCounts, displs, newType, MPI_COMM_WORLD);
 
 		subCounter = 1;
