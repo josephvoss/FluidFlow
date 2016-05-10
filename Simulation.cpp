@@ -131,7 +131,8 @@ double Simulation::pressureSolve(int xLocation, int yLocation, int i)
 
 //	double x=1;
 	double x = ((pip1jn+pim1jn)*dy*dy+(pijp1n+pijm1n)*dx*dx)/(2*(dx*dx+dy*dy)) - dx*dx*dy*dy/(dx*dx+dy*dy)*localB[i];
-//	printf("%d.%d: (%d, %d) %f\n", counter, subCounter, xLocation, yLocation, x);
+	if (counter > 1 && counter < 10)
+		printf("%d.%d: (%d, %d) %f %f %f %f %f\n", counter, subCounter, xLocation, yLocation,  pijp1n, pijm1n, pim1jn, pip1jn, x);
 	return x;
 };
 
@@ -144,9 +145,9 @@ double Simulation::yMomentumSolve(int xLocation, int yLocation)
 	//Periodic
 	if (xLocation == nx-1)
 	{
-		pijp1n = solvedPrePresData[nit-1][0+yLocation*ny];
-		uijp1n = solvedVelData[counter-1][0+yLocation*ny].u;
-		vijp1n = solvedVelData[counter-1][0+yLocation*ny].v;
+		pijp1n = solvedPrePresData[nit-1][1+yLocation*ny];
+		uijp1n = solvedVelData[counter-1][1+yLocation*ny].u;
+		vijp1n = solvedVelData[counter-1][1+yLocation*ny].v;
 	}
 	else
 	{
@@ -156,9 +157,9 @@ double Simulation::yMomentumSolve(int xLocation, int yLocation)
 	}
 	if (xLocation == 0)
 	{
-		pijm1n = solvedPrePresData[nit-1][nx-1+yLocation*ny];
-		uijm1n = solvedVelData[counter-1][nx-1+yLocation*ny].u;
-		vijm1n = solvedVelData[counter-1][nx-1+yLocation*ny].v;
+		pijm1n = solvedPrePresData[nit-1][nx-2+yLocation*ny];
+		uijm1n = solvedVelData[counter-1][nx-2+yLocation*ny].u;
+		vijm1n = solvedVelData[counter-1][nx-2+yLocation*ny].v;
 	}
 	else
 	{
@@ -190,27 +191,27 @@ double Simulation::xMomentumSolve(int xLocation, int yLocation)
 		return 0;
 	if (xLocation == nx-1)
 	{
-		pijp1n = solvedPrePresData[nit-1][0+yLocation*ny];
-		uijp1n = solvedVelData[counter-1][0+yLocation*ny].u;
-		vijp1n = solvedVelData[counter-1][0+yLocation*ny].v;
+		pijm1n = solvedPrePresData[nit-1][0+yLocation*ny];
+		uijm1n = solvedVelData[counter-1][0+yLocation*ny].u;
+		vijm1n = solvedVelData[counter-1][0+yLocation*ny].v;
 	}
 	else
 	{
-		uijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].u;
-		vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
-		pijp1n = solvedPrePresData[nit-1][xLocation+1+yLocation*ny];
+		uijm1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].u;
+		vijm1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
+		pijm1n = solvedPrePresData[nit-1][xLocation+1+yLocation*ny];
 	}
 	if (xLocation == 0)
 	{
-		pijm1n = solvedPrePresData[nit-1][nx-1+yLocation*ny];
-		uijm1n = solvedVelData[counter-1][nx-1+yLocation*ny].u;
-		vijm1n = solvedVelData[counter-1][nx-1+yLocation*ny].v;
+		pijp1n = solvedPrePresData[nit-1][nx-1+yLocation*ny];
+		uijp1n = solvedVelData[counter-1][nx-1+yLocation*ny].u;
+		vijp1n = solvedVelData[counter-1][nx-1+yLocation*ny].v;
 	}
 	else
 	{
-		uijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].u;
-		vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
-		pijm1n = solvedPrePresData[nit-1][xLocation-1+yLocation*ny];
+		uijp1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].u;
+		vijp1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
+		pijp1n = solvedPrePresData[nit-1][xLocation-1+yLocation*ny];
 	}
 	//Aliases
 	uip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].u;
@@ -222,9 +223,11 @@ double Simulation::xMomentumSolve(int xLocation, int yLocation)
 	uijn = solvedVelData[counter-1][xLocation+yLocation*ny].u;
 	vijn = solvedVelData[counter-1][xLocation+yLocation*ny].v;
 
-	return  uijn - uijn*dt/dx*(uijn - uim1jn) - vijn*dt/dy*(uijn - uijm1n) -
+	double x = uijn - uijn*dt/dx*(uijn - uim1jn) - vijn*dt/dy*(uijn - uijm1n) -
 	dt/(rho*2*dx)*(pip1jn - pim1jn) + nu*(dt/(dx*dx)*(uip1jn - 2*uijn + uim1jn) +
 	dt/(dy*dy)*(uijp1n - 2*uijn + uijm1n)) + F*dt;
+//	printf("%d: (%d, %d) %f %f %f %f\n", counter, xLocation, yLocation, uim1jn, uijn, uip1jn, x);
+	return x;
 }
 
 void Simulation::iterate(void)
