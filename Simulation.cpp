@@ -158,7 +158,7 @@ double Simulation::xMomentumSolve(int xLocation, int yLocation)
 	double pijp1n = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
 	double pijm1n = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
 
-	if (yLocation == ny-1)
+	if (yLocation >= ny-1)
 		return 0;
 	if (yLocation == 0)
 		return 0;
