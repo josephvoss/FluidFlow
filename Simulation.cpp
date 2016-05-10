@@ -263,25 +263,6 @@ void Simulation::iterate(void)
 			solvedPrePresData[0][i] = solvedVelData[counter-1][i].p; //pressurePreSolve uses this array, iterates in ptime
 			localB[i] = buildUpB(xLocation, yLocation);
 		}
-/*
-		MPI_Allgatherv(localB, numCells, MPI_DOUBLE, globalB, recCounts, displs, MPI_DOUBLE, MPI_COMM_WORLD);
-		// Periodic B bc needs to be satified after all values collected
-		for (i=0; i<problemSize; i++)
-		{
-			xLocation = i % nx;
-			yLocation = i / nx;
-
-			if (yLocation == 0)
-				globalB[xLocation] = globalB[xLocation+(1)*ny];
-			if (yLocation == ny-1)
-				globalB[xLocation+(ny-1)*ny] = globalB[xLocation+(ny-2)*ny];
-			if (xLocation == 0)
-				globalB[yLocation*ny] = globalB[1+yLocation*ny];
-			if (xLocation == nx-1)
-				globalB[nx-1+yLocation*ny] = globalB[nx-2+yLocation*ny];
-//			printf("%d: (%d, %d) %f\n", counter, xLocation, yLocation, globalB[i]);
-		}
-*/
 //		i=numCells;
 		//Solve pressure for n
 		while (subCounter < nit)
@@ -302,14 +283,14 @@ void Simulation::iterate(void)
 				xLocation = i% nx;
 				yLocation = i/ nx;
 
-				if (yLocation == 0)
-					solvedPrePresData[subCounter][xLocation] = solvedPrePresData[subCounter][xLocation+(1)*ny];
-				if (yLocation == ny-1)
-					solvedPrePresData[subCounter][xLocation+(ny-1)*ny] = solvedPrePresData[subCounter][xLocation+(ny-2)*ny];
 				if (xLocation == 0)
 					solvedPrePresData[subCounter][yLocation*ny] = solvedPrePresData[subCounter][1+yLocation*ny];
 				if (xLocation == nx-1)
 					solvedPrePresData[subCounter][nx-1+yLocation*ny] = solvedPrePresData[subCounter][nx-2+yLocation*ny];
+				if (yLocation == 0)
+					solvedPrePresData[subCounter][xLocation] = solvedPrePresData[subCounter][xLocation+(1)*ny];
+				if (yLocation == ny-1)
+					solvedPrePresData[subCounter][xLocation+(ny-1)*ny] = solvedPrePresData[subCounter][xLocation+(ny-2)*ny];
 			}
 		}
 		
@@ -328,16 +309,6 @@ void Simulation::iterate(void)
 //		MPI_allgathe
 		MPI_Allgatherv(localVelData, numCells, newType, &(solvedVelData[counter][0]), recCounts, displs, newType, MPI_COMM_WORLD);
 
-/*		int x,y;
-		for (i=0; i<problemSize; i++)
-		{
-			x = i/nx; y = i%nx;
-			//swap x and y for better hdf5 formatting, unnecessary
-			solvedPMat[counter][x][y] = i;//solvedVelData[counter][startingLocation+i].p;
-			solvedUMat[counter][x][y] = i;// solvedVelData[counter][i].u;
-			solvedVMat[counter][x][y] = i;//solvedVelData[counter][i].v;
-		}
-*/
 		subCounter = 1;
 		counter += 1;
 	}
