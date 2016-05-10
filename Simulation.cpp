@@ -52,49 +52,54 @@ Simulation::Simulation()
 
 double Simulation::buildUpB(int xLocation, int yLocation)
 {
-	//Aliases
-	double uijn = solvedVelData[counter-1][xLocation+yLocation*ny].u;
-	double vijn = solvedVelData[counter-1][xLocation+yLocation*ny].v;
-	double uim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].u;
-	double uip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].u;
-	double uijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].u;
-	double uijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].u;
-	double vim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].v;
-	double vip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].v;
-	double vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
-	double vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
-
+	//Questionable BC
 	if (yLocation == ny-1)
 		return 0;
 	if (yLocation == 0)
 		return 0;
-	if (xLocation == ny-1)
-		return 0;
+	//Periodic
+	if (xLocation == nx-1)
+		uip1jn = solvedVelData[counter-1][0+yLocation*ny].u;
 	if (xLocation == 0)
-		return 0;
+		uim1jn = solvedVelData[counter-1][nx-1+yLocation*ny].u;
+
+	//Aliases
+	uijn = solvedVelData[counter-1][xLocation+yLocation*ny].u;
+	vijn = solvedVelData[counter-1][xLocation+yLocation*ny].v;
+	uim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].u;
+	uip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].u;
+	uijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].u;
+	uijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].u;
+	vim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].v;
+	vip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].v;
+	vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
+	vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
 
 //	double b=0;
 	double b = rho*(1/dt*((uijp1n - uijm1n)/(2*dx) + (vip1jn - vim1jn)/(2*dy)) - pow((uijp1n - uijm1n)/(2*dx),2) - 2*(uip1jn - uim1jn)/(2*dy) * (vijp1n - vijm1n)/(2*dx) - pow((vip1jn - vim1jn)/(2*dy),2));
-//	printf("%d: (%d, %d) %f\n", counter, xLocation, yLocation, b);
+	printf("%d: (%d, %d) %f\n", counter, xLocation, yLocation, b);
 	return b;
 
 }
 
 double Simulation::pressureSolve(int xLocation, int yLocation, int i)
 {
+	//Questionable BC
 	if (yLocation == ny-1)
 		return 1;
 	if (yLocation == 0)
 		return 1;
-	if (xLocation == ny-1)
-		return 1;
+	//Periodic
+	if (xLocation == nx-1)
+		pip1jn = solvedPrePresData[counter-1][0+yLocation*ny];
 	if (xLocation == 0)
-		return 1;
+		pim1jn = solvedPrePresData[counter-1][nx-1+yLocation*ny];
+
 	//Aliases
-	double pip1jn = solvedPrePresData[subCounter-1][xLocation+(yLocation+1)*ny];
-	double pim1jn = solvedPrePresData[subCounter-1][xLocation+(yLocation-1)*ny];
-	double pijp1n = solvedPrePresData[subCounter-1][xLocation+(yLocation+1)*ny];
-	double pijm1n = solvedPrePresData[subCounter-1][xLocation+(yLocation-1)*ny];
+	pip1jn = solvedPrePresData[subCounter-1][xLocation+(yLocation+1)*ny];
+	pim1jn = solvedPrePresData[subCounter-1][xLocation+(yLocation-1)*ny];
+	pijp1n = solvedPrePresData[subCounter-1][xLocation+(yLocation+1)*ny];
+	pijm1n = solvedPrePresData[subCounter-1][xLocation+(yLocation-1)*ny];
 
 	//For distributed workload collective needs to be done at end of each ptimestep
 	//Will square the communication necessary
@@ -118,22 +123,35 @@ double Simulation::yMomentumSolve(int xLocation, int yLocation)
 		return 0;
 	if (xLocation == 0)
 		return 0;
+	//Periodic
+	if (xLocation == nx-1)
+	{
+		pip1jn = solvedPrePresData[counter-1][0+yLocation*ny];
+		uip1jn = solvedVelData[counter-1][0+yLocation*ny].u;
+		vip1jn = solvedVelData[counter-1][0+yLocation*ny].v;
+	}
+	if (xLocation == 0)
+	{
+		pim1jn = solvedPrePresData[counter-1][nx-1+yLocation*ny];
+		uim1jn = solvedVelData[counter-1][nx-1+yLocation*ny].u;
+		vim1jn = solvedVelData[counter-1][nx-1+yLocation*ny].v;
+	}
 
 	//Aliases
-	double uijn = solvedVelData[counter-1][xLocation+yLocation*ny].u;
-	double vijn = solvedVelData[counter-1][xLocation+yLocation*ny].v;
-	double uim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].u;
-	double uip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].u;
-	double uijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].u;
-	double uijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].u;
-	double vim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].v;
-	double vip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].v;
-	double vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
-	double vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
-	double pip1jn = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
-	double pim1jn = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
-	double pijp1n = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
-	double pijm1n = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
+	uijn = solvedVelData[counter-1][xLocation+yLocation*ny].u;
+	vijn = solvedVelData[counter-1][xLocation+yLocation*ny].v;
+	uim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].u;
+	uip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].u;
+	uijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].u;
+	uijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].u;
+	vim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].v;
+	vip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].v;
+	vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
+	vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
+	pip1jn = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
+	pim1jn = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
+	pijp1n = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
+	pijm1n = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
 
 	return vijn - uijn*dt/dx*(vijn - vim1jn) - vijn*dt/dy*(vijn - vijm1n) -
 	dt/(rho*2*dy)*(pijp1n - pijp1n) + nu*(dt/(dx*dx)*(vip1jn - 2*vijn + vim1jn) + 
@@ -142,26 +160,40 @@ double Simulation::yMomentumSolve(int xLocation, int yLocation)
 
 double Simulation::xMomentumSolve(int xLocation, int yLocation)
 {
-	//Aliases
-	double uijn = solvedVelData[counter-1][xLocation+yLocation*ny].u;
-	double vijn = solvedVelData[counter-1][xLocation+yLocation*ny].v;
-	double uim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].u;
-	double uip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].u;
-	double uijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].u;
-	double uijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].u;
-	double vim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].v;
-	double vip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].v;
-	double vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
-	double vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
-	double pip1jn = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
-	double pim1jn = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
-	double pijp1n = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
-	double pijm1n = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
-
 	if (yLocation >= ny-1)
 		return 0;
 	if (yLocation == 0)
 		return 0;
+
+	//Periodic
+	if (xLocation == nx-1)
+	{
+		pip1jn = solvedPrePresData[counter-1][0+yLocation*ny];
+		uip1jn = solvedVelData[counter-1][0+yLocation*ny].u;
+		vip1jn = solvedVelData[counter-1][0+yLocation*ny].v;
+	}
+	if (xLocation == 0)
+	{
+		pim1jn = solvedPrePresData[counter-1][nx-1+yLocation*ny];
+		uim1jn = solvedVelData[counter-1][nx-1+yLocation*ny].u;
+		vim1jn = solvedVelData[counter-1][nx-1+yLocation*ny].v;
+	}
+
+	//Aliases
+	uijn = solvedVelData[counter-1][xLocation+yLocation*ny].u;
+	vijn = solvedVelData[counter-1][xLocation+yLocation*ny].v;
+	uim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].u;
+	uip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].u;
+	uijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].u;
+	uijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].u;
+	vim1jn = solvedVelData[counter-1][xLocation+(yLocation-1)*ny].v;
+	vip1jn = solvedVelData[counter-1][xLocation+(yLocation+1)*ny].v;
+	vijm1n = solvedVelData[counter-1][xLocation-1+yLocation*ny].v;
+	vijp1n = solvedVelData[counter-1][xLocation+1+yLocation*ny].v;
+	pip1jn = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
+	pim1jn = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
+	pijp1n = solvedPrePresData[nit-1][xLocation+(yLocation+1)*ny];
+	pijm1n = solvedPrePresData[nit-1][xLocation+(yLocation-1)*ny];
 
 	return  uijn - uijn*dt/dx*(uijn - uim1jn) - vijn*dt/dy*(uijn - uijm1n) -
 	dt/(rho*2*dx)*(pip1jn - pim1jn) + nu*(dt/(dx*dx)*(uip1jn - 2*uijn + uim1jn) +
@@ -200,9 +232,9 @@ void Simulation::iterate(void)
 			solvedPrePresData[0][i] = solvedVelData[counter-1][i].p; //pressurePreSolve uses this array, iterates in ptime
 			localB[i] = buildUpB(xLocation, yLocation);
 		}
-
+/*
 		MPI_Allgatherv(localB, numCells, MPI_DOUBLE, globalB, recCounts, displs, MPI_DOUBLE, MPI_COMM_WORLD);
-		// dP/dy and dP/dx bc needs to be satified after all values collected
+		// Periodic B bc needs to be satified after all values collected
 		for (i=0; i<problemSize; i++)
 		{
 			xLocation = i % nx;
@@ -218,6 +250,7 @@ void Simulation::iterate(void)
 				globalB[nx-1+yLocation*ny] = globalB[nx-2+yLocation*ny];
 //			printf("%d: (%d, %d) %f\n", counter, xLocation, yLocation, globalB[i]);
 		}
+*/
 //		i=numCells;
 		//Solve pressure for n
 		while (subCounter < nit)

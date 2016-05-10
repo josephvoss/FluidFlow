@@ -42,6 +42,8 @@ class Simulation
 		double* solvedPrePresData[nit];
 		double* localB;
 		double* globalB;
+	
+		double uijn,vijn,uim1jn,uip1jn,uijm1n,uijp1n,vim1jn,vip1jn,vijm1n,vijp1n,pip1jn,pim1jn,pijp1n,pijm1n;
 
 		int* recCounts;
 
