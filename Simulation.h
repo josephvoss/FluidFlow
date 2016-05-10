@@ -41,6 +41,7 @@ class Simulation
 		double* localPrePresData;
 		double* solvedPrePresData[nit];
 		double* localB;
+		double* globalB;
 
 		int* recCounts;
 
@@ -53,7 +54,7 @@ class Simulation
 	public:
 		Simulation();
 		double buildUpB(int xLocation, int yLocation);
-		double pressureSolve(int xLocation, int yLocation);
+		double pressureSolve(int xLocation, int yLocation, int i);
 		double xMomentumSolve(int xLocation, int yLocation);
 		double yMomentumSolve(int xLocation, int yLocation);
 		void iterate(void);

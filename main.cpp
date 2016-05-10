@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 	{
 		hid_t file, datasetP, datasetU, datasetV;
 		hid_t datatype, dataspace, memspaceP, memspaceU, memspaceV;
-		file = H5Fcreate("output.hdf5",H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+		file = H5Fcreate("./logFiles/output.hdf5",H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 		std::cout<<"Made a file"<<std::endl;
 
 		hsize_t offsetP[3] = {0,0,0};
