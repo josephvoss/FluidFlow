@@ -1,17 +1,24 @@
 #Makefile
-CC := h5c++
+ERR = $(shell which icpc >/dev/null; echo $$?)
+ifeq "$(ERR)" "0"
+    sysCC := icpc
+    OMPFLAG := -openmp
+else	
+    sysCC := g++
+    OMPFLAG := -fopenmp
+endif
 
-OMPFLAG := -openmp
+CC := h5c++
 
 #To get compile and linker flags with g++
 MPIraw := $(shell mpic++ -show ./test.false)
 HDF5raw := $(shell h5c++ -show ./test.false)
 
-MPInoprog = $(subst g++ ,,${MPIraw})
+MPInoprog = $(subst ${sysCC} ,,${MPIraw})
 MPIlinker = $(shell echo ${MPInoprog} | awk 'BEGIN {FS="./test.false"} {print $$1}')
 MPIcompile = $(shell echo ${MPInoprog} | awk 'BEGIN {FS="./test.false"} {print $$2}')
 
-HDF5noprog = $(subst g++ ,,${HDF5raw})
+HDF5noprog = $(subst ${sysCC} ,,${HDF5raw})
 HDF5linker = $(shell echo ${HDF5noprog} | awk 'BEGIN {FS="./test.false"} {print $$1}')
 HDF5compile = $(shell echo ${HDF5noprog} | awk 'BEGIN {FS="./test.false"} {print $$2}')
 
