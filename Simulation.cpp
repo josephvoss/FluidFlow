@@ -298,7 +298,7 @@ void Simulation::iterate(void)
 
 			localVelData[i].u = xMomentumSolve(xLocation, yLocation); //needs to be for n
 			localVelData[i].v = yMomentumSolve(xLocation, yLocation); //needs to be for n
-			localVelData[i].p = 1;//solvedPrePresData[nit-1][startingLocation+i]; //needs to be for n
+			localVelData[i].p = solvedPrePresData[nit-1][startingLocation+i]; //needs to be for n
 //			if (yLocation == 40 && xLocation == 40)
 //				localVelData[i].p = 100;
 	
