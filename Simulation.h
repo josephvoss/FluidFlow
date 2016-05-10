@@ -27,7 +27,7 @@ class Simulation
 
 		//Physical Values
 		int rho=1;
-		int nu=.1; 
+		int nu=1; 
 		int F=10; //needed?
 
 		int numCells;
