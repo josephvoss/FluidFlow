@@ -7,6 +7,8 @@
 \documentclass[12pt]{article}
 \usepackage{listings}
 \usepackage{courier}
+\usepackage{graphicx}
+\graphicspath{ {images/} }
 \lstset{basicstyle=\footnotesize\ttfamily,breaklines=true}
 \begin{document}
 \maketitle
@@ -20,18 +22,12 @@ essential to modern system design, and was the main focus of my fluid mechanics 
 semester. The key aspects of interest are the pressure and velocity components as the flow travels, along with 
 studying the viscous losses associated with the flow. 
 
-To learn more about fluid mechanics I cheated a lot and stole someone elses code
 To learn the basics of computational fluid mechanics I read several textbooks and online articles. However, the most 
 useful resource by far was the 12 Steps to Navier-Stokes online course published by the Lorena A. Barba research lab. 
 Through a series of interactive ipython notebooks they model several types of one dimensional and two dimensional 
 flows, before eventually building up to a basic solution of the Navier-Stokes equations. This resource showed me a 
 relatively simple was to model fluid flow, and provided the equations necessary along with a rough outline of the 
 different steps required to solve them.
-Thanks?
-
-
-Other stuff......
-
 
 \section{Algorithim to be Parallelized}
 To solve this problem the two dimensional Navier Stokes equations were used in addition to the Possion Pressure 
@@ -58,7 +54,7 @@ momentum equations have a component of velocity that is differentiated by time. 
 pressure terms are only differentied by the x and y dimensions. Therefore, the pressure equation needs to be solved 
 by successive iterations, while the momentum equations can be solved in a single timestep.
 
-Note that these equations need to have boundary conditions to be solved. 
+%Note that these equations need to have boundary conditions to be solved. 
 
 \section{How that Parallelization was acheived, design goals}
 
@@ -129,8 +125,39 @@ while counter < numberTimeSteps
 \end{lstlisting}
 
 \section{Timing Results and Trace}
+The program was run for a 300x300 size grid with 500 time steps and 300 pseudotime steps. The timing results for this 
+large-scale run can be seen in the graph below. As one can see, the run time actually increases with the number of 
+cores due. The reason behind this can be seen in the trace diagram for a small-scale version of this program. One can 
+see the large blocks of MPI communication which fills up most of the diagram. The tiny slivers of brown green in 
+between them are where the actual calculations are being performed. Therefore the timing behavior observed makes 
+intuitive sense. For large work loads the performance is increased as the number of processors increase, to a certain 
+extent. Once the workload on each processor is light enough the communication between the processors becomes a much 
+more limiting factor than the calculations itself. After this point, additional processors will do nothing fill the 
+network with more communications and make the program more and more reliant on slow communications to do the same 
+amount of work. This explains why the performance gain per processor isn't a linear or even asymptopic curve, but 
+rather can actually increase the run time of the program.
+\begin{figure}[h]
+\centering
+\caption{ Timing results}
+\includegraphics[width=0.5\textwidth]{trace.png}
+\end{figure}
+\begin{figure}[h]
+\centering
+\caption{TAU trace of the program}
+\includegraphics[width=0.5\textwidth]{trace.png}
+\end{figure}
 
-\section{Conclusions}
-I worked hard and achieved very little.
+
+Below once can see the solved image of flow for laminar flow through a channel. The constant color background means 
+that the pressure is constant everywhere, and the viscous effects due to the walls clearly reduce the energy of the 
+flow. Because the velocity gradient isn't a parabola this means that the flow is still developing, and viscous effects 
+will become more dominant as time progresses. All of these observations coincide exactly with the ideal and 
+experiemental behavior of two dimensional flow through a pipe, thus proving that the model was successful in modelling 
+flow under these conditions.
+\begin{figure}[h]
+\centering
+\caption{The solved velocity and pressure data}
+\includegraphics[width=0.75\textwidth]{solvedFlow2.png}
+\end{figure}
 
 \end{document}
