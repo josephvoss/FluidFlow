@@ -297,12 +297,11 @@ void Simulation::iterate(void)
 			xLocation = (startingLocation+i) % nx;
 			yLocation = (startingLocation+i) / ny;
 
-			localVelData[i].u = xMomentumSolve(xLocation, yLocation); //needs to be for n
-			localVelData[i].v = yMomentumSolve(xLocation, yLocation); //needs to be for n
-			localVelData[i].p = solvedPrePresData[nit-1][startingLocation+i]; //needs to be for n
-	
+			localVelData[i].u = 2000+counter*10+i;//xMomentumSolve(xLocation, yLocation); //needs to be for n
+			localVelData[i].v = 3000+counter*10+i;//yMomentumSolve(xLocation, yLocation); //needs to be for n
+			localVelData[i].p = 1000+counter*10+i;//solvedPrePresData[nit-1][startingLocation+i]; //needs to be for n
 		}
-		MPI_Allgatherv(localVelData, numCells, newType, &(solvedVelData[counter][0]), recCounts, displs, newType, MPI_COMM_WORLD);
+		MPI_Allgatherv(localVelData, numCells, newType, solvedVelData[counter], recCounts, displs, newType, MPI_COMM_WORLD);
 
 		subCounter = 1;
 		counter += 1;

@@ -17,9 +17,9 @@ class Simulation
 {
 	private:
 		//Size values
-		const static int nx = 41;
-		const static int ny = 41;
-		const static int nt = 100;
+		const static int nx = 30;
+		const static int ny = 30;
+		const static int nt = 30;
 		const static int nit = 50;
 		double dx;
 		double dy;
