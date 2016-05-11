@@ -1,0 +1,34 @@
++ date
+++ seq 5 5 80
++ for i in '`seq 5 5 80`'
++ ibrun -np 5 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 10 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 15 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 20 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 25 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 30 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 35 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 40 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 45 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 50 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 55 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 60 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 65 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 70 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 75 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 80 ./fluid

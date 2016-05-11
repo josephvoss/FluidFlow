@@ -1,0 +1,18 @@
++ date
+++ seq 5 5 80
++ for i in '`seq 5 5 80`'
++ ibrun -np 5 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 10 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 15 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 20 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 25 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 30 ./fluid
++ for i in '`seq 5 5 80`'
++ ibrun -np 35 ./fluid
+slurmstepd: *** JOB 7032462 CANCELLED AT 2016-05-11T01:49:13 DUE TO TIME LIMIT on c449-601 ***
+[c449-601.stampede.tacc.utexas.edu:mpirun_rsh][signal_processor] Caught signal 15, killing job

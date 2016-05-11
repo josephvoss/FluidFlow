@@ -1,0 +1,11 @@
++ date
+++ seq 5 5 80
++ for i in '`seq 5 5 80`'
++ mpirun -np 5 ./fluid
+slurmstepd: *** JOB 7032174 CANCELLED AT 2016-05-11T00:55:18 DUE TO TIME LIMIT on c461-403 ***
+[mpiexec@c461-403.stampede.tacc.utexas.edu] HYDU_sock_write (utils/sock/sock.c:286): write error (Bad file descriptor)
+[mpiexec@c461-403.stampede.tacc.utexas.edu] HYD_pmcd_pmiserv_send_signal (pm/pmiserv/pmiserv_cb.c:169): unable to write data to proxy
+[mpiexec@c461-403.stampede.tacc.utexas.edu] ui_cmd_cb (pm/pmiserv/pmiserv_pmci.c:79): unable to send signal downstream
+[mpiexec@c461-403.stampede.tacc.utexas.edu] HYDT_dmxu_poll_wait_for_event (tools/demux/demux_poll.c:76): callback returned error status
+[mpiexec@c461-403.stampede.tacc.utexas.edu] HYD_pmci_wait_for_completion (pm/pmiserv/pmiserv_pmci.c:198): error waiting for event
+[mpiexec@c461-403.stampede.tacc.utexas.edu] main (ui/mpich/mpiexec.c:344): process manager error waiting for completion
