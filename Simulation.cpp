@@ -28,6 +28,8 @@ Simulation::Simulation()
 	localVelData = (datumPoint*) malloc(sizeof(datumPoint)*numCells);
 	for (i=0; i<nit; i++)
 		solvedPrePresData[i] = (double*) malloc(sizeof(double)*problemSize);
+	for (i=0; i<nt; i++)
+		solvedVelData[i] = (datumPoint*) malloc(sizeof(datumPoint)*problemSize);
 
 	startingLocation = numCells * myRank;
 
@@ -49,6 +51,16 @@ Simulation::Simulation()
 	}
 }
 
+int Simulation::getNt(void)
+	{ 	return nt; 	}
+int Simulation::getNx(void)
+	{ 	return nx; 	}
+int Simulation::getNy(void)
+	{ 	return ny; 	}
+int Simulation::getProblemSize(void)
+	{ 	return problemSize; 	}
+int Simulation::getRank(void)
+	{ 	return myRank; 	}
 double Simulation::buildUpB(int xLocation, int yLocation)
 {
 	//Questionable BC
@@ -291,7 +303,6 @@ void Simulation::iterate(void)
 			localVelData[i].p = solvedPrePresData[nit-1][startingLocation+i]; //needs to be for n
 	
 		}
-
 		MPI_Allgatherv(localVelData, numCells, newType, &(solvedVelData[counter][0]), recCounts, displs, newType, MPI_COMM_WORLD);
 
 		subCounter = 1;

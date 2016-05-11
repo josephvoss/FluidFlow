@@ -17,8 +17,8 @@ class Simulation
 {
 	private:
 		//Size values
-		const static int nx = 42;
-		const static int ny = 42;
+		const static int nx = 41;
+		const static int ny = 41;
 		const static int nt = 100;
 		const static int nit = 50;
 		double dx;
@@ -60,19 +60,11 @@ class Simulation
 		double yMomentumSolve(int xLocation, int yLocation);
 		void iterate(void);
 
-		int getNt(void)
-			{ 	return nt; 	}
-		int getNx(void)
-			{ 	return nx; 	}
-		int getNy(void)
-			{ 	return ny; 	}
-		int getProblemSize(void)
-			{ 	return problemSize; 	}
-		int getRank(void)
-			{ 	return myRank; 	}
+		int getNt(void);
+		int getNx(void);
+		int getNy(void);
+		int getProblemSize(void);
+		int getRank(void);
 
-		double solvedPMat[nt][ny][nx];
-		double solvedUMat[nt][ny][nx];
-		double solvedVMat[nt][ny][nx];
-		datumPoint solvedVelData[nt][problemSize];
+		datumPoint* solvedVelData[nt];
 };

@@ -22,8 +22,6 @@ int main(int argc, char** argv)
 		std::cout<<"Made a file"<<std::endl;
 
 		hsize_t offsetP[3] = {0,0,0};
-		hsize_t offsetU[3] = {0,0,1};
-		hsize_t offsetV[3] = {0,0,2};
 		hsize_t stride1[3] = {1,1,1};
 		hsize_t stride2[3] = {1,1,3};
 
