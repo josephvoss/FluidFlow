@@ -13,13 +13,11 @@ int main(int argc, char** argv)
 	Simulation* workBench = new Simulation;
 	workBench->iterate();
 
-	std::cout<<"Running"<<std::endl;
 	if (workBench->getRank() == 0)
 	{
 		hid_t file, datasetP, datasetU, datasetV;
 		hid_t datatype, dataspace, memspaceP, memspaceU, memspaceV;
 		file = H5Fcreate("./logFiles/output.hdf5",H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-		std::cout<<"Made a file"<<std::endl;
 
 		hsize_t offsetP[3] = {0,0,0};
 		hsize_t offsetU[3] = {0,0,1};

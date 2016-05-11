@@ -254,6 +254,8 @@ void Simulation::iterate(void)
 		sum += recCounts[i];
 	}		
 
+
+	double timer1 = MPI_Wtime();
 	//U and V populating
 	while (counter < nt)
 	{
@@ -306,6 +308,10 @@ void Simulation::iterate(void)
 		subCounter = 1;
 		counter += 1;
 	}
+	double timer2 = MPI_Wtime();
+	double dtime = timer2-timer1;
+	if (myRank == 0)
+		printf("%d %f\n", size, dtime);
 
 	MPI_Type_free(&newType);
 }
